@@ -1,6 +1,5 @@
 **Project requirements**
 
-# **![][image1]**
 
 ## **The Modern Job Hunting Portal**
 

@@ -73,15 +73,15 @@ export default function StatsSection() {
   ];
 
   return (
-    <section className='relative overflow-hidden bg-gradient-to-b from-black via-gray-950 to-black py-32 text-white'>
-      {/* Animated Background Gradient */}
+    <section className='relative overflow-hidden bg-linear-to-b from-black via-gray-950 to-black py-32 text-white'>
+      {/* Animated Background linear */}
       <motion.div
         className='absolute inset-0 opacity-30'
         animate={{
           background: [
-            'radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%)',
-            'radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%)',
-            'radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%)',
+            'radial-linear(circle at 20% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%)',
+            'radial-linear(circle at 80% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%)',
+            'radial-linear(circle at 20% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%)',
           ],
         }}
         transition={{
@@ -121,8 +121,8 @@ export default function StatsSection() {
         className='absolute inset-0 opacity-5'
         style={{
           backgroundImage: `
-            linear-gradient(to right, rgba(139, 92, 246, 0.2) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(139, 92, 246, 0.2) 1px, transparent 1px)
+            linear-linear(to right, rgba(139, 92, 246, 0.2) 1px, transparent 1px),
+            linear-linear(to bottom, rgba(139, 92, 246, 0.2) 1px, transparent 1px)
           `,
           backgroundSize: '50px 50px',
         }}
@@ -165,7 +165,7 @@ export default function StatsSection() {
               whileInView={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.8 }}
               viewport={{ once: true }}
-              className='bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent'
+              className='bg-linear-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent'
             >
               15,000+ Job Seekers
             </motion.span>
@@ -187,7 +187,7 @@ export default function StatsSection() {
             whileInView={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
             viewport={{ once: true }}
-            className='mt-8 flex flex-wrap items-center justify-center gap-3'
+            className='cursor-pointer mt-8 flex flex-wrap items-center justify-center gap-3'
           >
             {['Remote Jobs', 'On-site Jobs', 'Hybrid Jobs', 'Freelance'].map(
               (job, idx) => (
@@ -213,7 +213,7 @@ export default function StatsSection() {
           initial='hidden'
           whileInView='visible'
           viewport={{ once: true, margin: '-100px' }}
-          className='mt-24 grid gap-6 md:grid-cols-2 lg:grid-cols-4'
+          className='cursor-pointer mt-24 grid gap-6 md:grid-cols-2 lg:grid-cols-4'
         >
           {stats.map((stat) => (
             <motion.div
@@ -224,13 +224,13 @@ export default function StatsSection() {
                 scale: 1.02,
                 transition: { type: 'spring', stiffness: 300 },
               }}
-              className='group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.03] to-transparent p-8 backdrop-blur-xl transition-all duration-300 hover:border-violet-500/50 hover:shadow-2xl hover:shadow-violet-500/20'
+              className='group relative overflow-hidden rounded-2xl border border-white/10 bg-linear-to-br from-white/3 to-transparent p-8 backdrop-blur-xl transition-all duration-300 hover:border-violet-500/50 hover:shadow-2xl hover:shadow-violet-500/20'
             >
-              {/* Animated Gradient Border */}
+              {/* Animated linear Border */}
               <motion.div
-                className='absolute inset-0 rounded-2xl bg-gradient-to-r opacity-0 transition-opacity duration-500 group-hover:opacity-100'
+                className='absolute inset-0 rounded-2xl bg-linear-to-r opacity-0 transition-opacity duration-500 group-hover:opacity-100'
                 style={{
-                  background: `linear-gradient(90deg, transparent, ${stat.color.split(' ')[1]}, transparent)`,
+                  background: `linear-linear(90deg, transparent, ${stat.color.split(' ')[1]}, transparent)`,
                 }}
                 animate={{
                   x: ['-100%', '100%'],
@@ -246,7 +246,7 @@ export default function StatsSection() {
               <motion.div
                 className='absolute -bottom-20 -right-20 h-40 w-40 rounded-full blur-3xl'
                 style={{
-                  background: `linear-gradient(135deg, ${stat.color.split(' ')[1]}, transparent)`,
+                  background: `linear-linear(135deg, ${stat.color.split(' ')[1]}, transparent)`,
                 }}
                 animate={{
                   scale: [1, 1.2, 1],
@@ -261,11 +261,11 @@ export default function StatsSection() {
 
               {/* Icon with Animation */}
               <motion.div
-                className='relative z-10 mb-6 inline-flex rounded-xl bg-gradient-to-br from-white/10 to-white/5 p-3 text-white'
+                className='relative z-10 mb-6 inline-flex rounded-xl bg-linear-to-br from-white/10 to-white/5 p-3 text-white'
                 whileHover={{ rotate: 360, scale: 1.1 }}
                 transition={{ duration: 0.5 }}
                 style={{
-                  background: `linear-gradient(135deg, ${stat.color.split(' ')[1]}20, transparent)`,
+                  background: `linear-linear(135deg, ${stat.color.split(' ')[1]}20, transparent)`,
                 }}
               >
                 {stat.icon}
@@ -287,9 +287,9 @@ export default function StatsSection() {
 
               {/* Decorative Line */}
               <motion.div
-                className='relative z-10 mt-6 h-[2px] w-12 rounded-full'
+                className='relative z-10 mt-6 h-0.5 w-12 rounded-full'
                 style={{
-                  background: `linear-gradient(90deg, ${stat.color.split(' ')[1]}, transparent)`,
+                  background: `linear-linear(90deg, ${stat.color.split(' ')[1]}, transparent)`,
                 }}
                 initial={{ width: 0 }}
                 whileInView={{ width: 48 }}

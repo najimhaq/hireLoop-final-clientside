@@ -34,7 +34,7 @@ export default function Navbar() {
         <div className='flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8'>
           {/* LOGO */}
           <Link href='/' className='flex items-center gap-3'>
-            <div className='relative flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 via-fuchsia-500 to-purple-500 shadow-lg'>
+            <div className='relative flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br from-violet-600 via-fuchsia-500 to-purple-500 shadow-lg'>
               <div className='absolute inset-0 rounded-2xl bg-white/10' />
               <span className='relative text-xl font-bold text-white'>P</span>
             </div>
@@ -101,7 +101,7 @@ export default function Navbar() {
                 </>
               ) : (
                 <Link
-                  href='/auth/signin'
+                  href='/signin'
                   className='text-sm font-medium text-white/70 transition hover:text-violet-300'
                 >
                   Sign In
@@ -186,7 +186,7 @@ export default function Navbar() {
                     >
                       <Link
                         href={link.href}
-                        className='block rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 text-base font-medium text-white/75 transition hover:bg-white/5 hover:text-white'
+                        className='block rounded-2xl border border-white/8 bg-white/3 px-4 py-3 text-base font-medium text-white/75 transition hover:bg-white/5 hover:text-white'
                         onClick={() => setIsMenuOpen(false)}
                       >
                         {link.label}
@@ -199,7 +199,7 @@ export default function Navbar() {
                   <div className='flex flex-col gap-3'>
                     {user ? (
                       <>
-                        <div className='rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 text-sm text-white/75'>
+                        <div className='rounded-2xl border border-white/8 bg-white/3 px-4 py-3 text-sm text-white/75'>
                           Signed in as {user.name}
                         </div>
                         <Button
@@ -212,7 +212,7 @@ export default function Navbar() {
                       </>
                     ) : (
                       <Link
-                        href='/auth/signin'
+                        href='/signin'
                         className='rounded-2xl px-4 py-3 text-base font-medium text-violet-300 transition hover:bg-white/5'
                         onClick={() => setIsMenuOpen(false)}
                       >
