@@ -30,7 +30,7 @@ export default function RootLayout({ children }) {
         </header>
 
         <main className='grow'>
-          <div className='max-w-7xl mx-auto '>{children}</div>
+          <div className='max-w-full mx-auto'>{children}</div>
         </main>
         {/* footer */}
         <Footer />

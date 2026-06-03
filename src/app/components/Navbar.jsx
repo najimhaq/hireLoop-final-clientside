@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Button } from '@heroui/react';
 import { AnimatePresence, motion } from 'motion/react';
 import { signOut, useSession } from '../lib/auth-client';
+import UseAvater from './UseAvater';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -89,8 +90,10 @@ export default function Navbar() {
               {user ? (
                 <>
                   <span className='rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/75'>
-                    Hi, {user.name}
+                    Hi, {user.name?.split(' ')[0] || user.name}
                   </span>
+                  <UseAvater user={user} />
+
                   <Button
                     onClick={handleSignOut}
                     variant='ghost'
@@ -110,7 +113,7 @@ export default function Navbar() {
 
               <Button
                 as={Link}
-                href='/register'
+                href='/signin'
                 radius='full'
                 className='h-11 bg-white px-6 text-sm font-semibold text-black transition hover:scale-[1.02] hover:bg-zinc-200'
               >
@@ -222,7 +225,7 @@ export default function Navbar() {
 
                     <Button
                       as={Link}
-                      href='/register'
+                      href='/signin'
                       className='bg-white font-semibold text-black'
                       radius='full'
                     >

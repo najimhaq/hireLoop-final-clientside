@@ -8,6 +8,7 @@ import {
   FiMail,
   FiLock,
   FiUser,
+  FiImage,
   FiEye,
   FiEyeOff,
   FiArrowRight,
@@ -74,6 +75,7 @@ function InputField({
   setFocusedField,
   rightAction,
   delay,
+  required = true,
 }) {
   const isFocused = focusedField === name;
 
@@ -101,7 +103,7 @@ function InputField({
           onChange={onChange}
           onFocus={() => setFocusedField(name)}
           onBlur={() => setFocusedField(null)}
-          required
+          required={required}
           className='w-full rounded-xl bg-white/5 py-3 pl-10 pr-12 text-white placeholder-gray-500 focus:outline-none'
           placeholder={placeholder}
         />
@@ -128,6 +130,7 @@ export default function SignUpPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    imageUrl: '',
     password: '',
     confirmPassword: '',
   });
@@ -154,6 +157,7 @@ export default function SignUpPage() {
       placeholder: 'John Doe',
       icon: <FiUser className='h-5 w-5' />,
       delay: 0.4,
+      required: true,
     },
     {
       label: 'Email Address',
@@ -162,6 +166,16 @@ export default function SignUpPage() {
       placeholder: 'you@example.com',
       icon: <FiMail className='h-5 w-5' />,
       delay: 0.5,
+      required: true,
+    },
+    {
+      label: 'Profile Picture URL (optional)',
+      name: 'imageUrl',
+      type: 'url',
+      placeholder: 'https://example.com/your-photo.jpg',
+      icon: <FiImage className='h-5 w-5' />,
+      delay: 0.55,
+      required: false,
     },
     {
       label: 'Password',
@@ -211,16 +225,24 @@ export default function SignUpPage() {
       toast.error('Passwords do not match');
       return;
     }
+    if (formData.imageUrl) {
+      try {
+        new URL(formData.imageUrl);
+      } catch {
+        toast.error('Please enter a valid image URL');
+        return;
+      }
+    }
 
     setIsLoading(true);
 
     try {
-      // Role সহ signUp করুন
       const result = await signUp.email({
         email: formData.email,
         password: formData.password,
         name: formData.name,
-        role: role, // Role যোগ করুন
+        role: role,
+        image: formData.imageUrl || undefined,
         callbackURL: '/',
       });
 
@@ -239,7 +261,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className='relative min-h-screen overflow-hidden bg-gradient-to-br from-black via-gray-950 to-black'>
+    <div className='relative min-h-screen overflow-hidden bg-linear-to-br from-black via-gray-950 to-black'>
       <div className='absolute inset-0 overflow-hidden'>
         <motion.div
           {...floatingOrb(20)}
@@ -254,8 +276,8 @@ export default function SignUpPage() {
       <div
         className='absolute inset-0 opacity-5'
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(139, 92, 246, 0.2) 1px, transparent 1px),
-                          linear-gradient(to bottom, rgba(139, 92, 246, 0.2) 1px, transparent 1px)`,
+          backgroundImage: `linear-linear(to right, rgba(139, 92, 246, 0.2) 1px, transparent 1px),
+                          linear-linear(to bottom, rgba(139, 92, 246, 0.2) 1px, transparent 1px)`,
           backgroundSize: '50px 50px',
         }}
       />
@@ -276,13 +298,13 @@ export default function SignUpPage() {
             <Link href='/' className='group inline-flex items-center gap-3'>
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className='flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 via-fuchsia-500 to-purple-500 shadow-lg'
+                className='flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br from-violet-600 via-fuchsia-500 to-purple-500 shadow-lg'
               >
                 <FiUserPlus className='text-2xl text-white' />
               </motion.div>
 
               <div>
-                <h1 className='bg-gradient-to-r from-white to-gray-400 bg-clip-text text-2xl font-bold text-transparent'>
+                <h1 className='bg-linear-to-r from-white to-gray-400 bg-clip-text text-2xl font-bold text-transparent'>
                   HireLoop
                 </h1>
                 <p className='text-xs text-gray-500'>Create your account</p>
@@ -487,10 +509,10 @@ export default function SignUpPage() {
                 disabled={isLoading}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className='relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 py-3.5 font-semibold text-white transition-all hover:shadow-lg hover:shadow-violet-500/25 disabled:opacity-50'
+                className='relative w-full overflow-hidden rounded-xl bg-linear-to-r from-violet-600 to-fuchsia-600 py-3.5 font-semibold text-white transition-all hover:shadow-lg hover:shadow-violet-500/25 disabled:opacity-50'
               >
                 <motion.div
-                  className='absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent'
+                  className='absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent'
                   animate={{
                     x: isLoading ? '200%' : ['0%', '200%'],
                   }}
