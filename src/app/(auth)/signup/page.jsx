@@ -14,10 +14,12 @@ import {
   FiCheck,
   FiAlertCircle,
   FiUserPlus,
+  FiBriefcase,
+  FiUsers,
 } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { FaGithub } from 'react-icons/fa';
-
+import { Radio, RadioGroup } from '@heroui/react';
 import toast from 'react-hot-toast';
 import { signUp } from '@/app/lib/auth-client';
 
@@ -121,6 +123,7 @@ export default function SignUpPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
+  const [role, setRole] = useState('seeker'); // Role state
 
   const [formData, setFormData] = useState({
     name: '',
@@ -212,10 +215,12 @@ export default function SignUpPage() {
     setIsLoading(true);
 
     try {
+      // Role সহ signUp করুন
       const result = await signUp.email({
         email: formData.email,
         password: formData.password,
         name: formData.name,
+        role: role, // Role যোগ করুন
         callbackURL: '/',
       });
 
@@ -224,7 +229,7 @@ export default function SignUpPage() {
         return;
       }
 
-      toast.success('Account created successfully!');
+      toast.success(`Account created successfully as ${role}!`);
       router.push('/signin');
     } catch {
       toast.error('Something went wrong');
@@ -232,6 +237,7 @@ export default function SignUpPage() {
       setIsLoading(false);
     }
   };
+
   return (
     <div className='relative min-h-screen overflow-hidden bg-gradient-to-br from-black via-gray-950 to-black'>
       <div className='absolute inset-0 overflow-hidden'>
@@ -337,6 +343,101 @@ export default function SignUpPage() {
                 />
               ))}
 
+              {/* Role Selection - এখানে যোগ করুন */}
+              {/* Role Selection - কাস্টম ডিজাইন */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.8 }}
+                className='space-y-2'
+              >
+                <label className='block text-sm font-medium text-gray-300'>
+                  I am a
+                </label>
+
+                <div className='grid grid-cols-2 gap-3'>
+                  {/* Seeker Option */}
+                  <motion.button
+                    type='button'
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setRole('seeker')}
+                    className={`relative rounded-xl border p-4 transition-all ${
+                      role === 'seeker'
+                        ? 'border-violet-500 bg-violet-500/10 shadow-lg shadow-violet-500/20'
+                        : 'border-white/10 bg-white/5 hover:border-white/20'
+                    }`}
+                  >
+                    <div className='flex flex-col items-center gap-2 text-center'>
+                      <div
+                        className={`rounded-full p-2 ${role === 'seeker' ? 'bg-violet-500/20' : 'bg-white/5'}`}
+                      >
+                        <FiUsers
+                          className={`h-6 w-6 ${role === 'seeker' ? 'text-violet-400' : 'text-gray-400'}`}
+                        />
+                      </div>
+                      <div>
+                        <p
+                          className={`font-semibold ${role === 'seeker' ? 'text-white' : 'text-gray-300'}`}
+                        >
+                          Job Seeker
+                        </p>
+                        <p className='text-xs text-gray-500'>
+                          Looking for jobs
+                        </p>
+                      </div>
+                      {role === 'seeker' && (
+                        <motion.div
+                          layoutId='active-role'
+                          className='absolute -top-1 -right-1 h-4 w-4 rounded-full bg-violet-500'
+                        >
+                          <FiCheck className='h-3 w-3 text-white' />
+                        </motion.div>
+                      )}
+                    </div>
+                  </motion.button>
+
+                  {/* Recruiter Option */}
+                  <motion.button
+                    type='button'
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setRole('recruiter')}
+                    className={`relative rounded-xl border p-4 transition-all ${
+                      role === 'recruiter'
+                        ? 'border-fuchsia-500 bg-fuchsia-500/10 shadow-lg shadow-fuchsia-500/20'
+                        : 'border-white/10 bg-white/5 hover:border-white/20'
+                    }`}
+                  >
+                    <div className='flex flex-col items-center gap-2 text-center'>
+                      <div
+                        className={`rounded-full p-2 ${role === 'recruiter' ? 'bg-fuchsia-500/20' : 'bg-white/5'}`}
+                      >
+                        <FiBriefcase
+                          className={`h-6 w-6 ${role === 'recruiter' ? 'text-fuchsia-400' : 'text-gray-400'}`}
+                        />
+                      </div>
+                      <div>
+                        <p
+                          className={`font-semibold ${role === 'recruiter' ? 'text-white' : 'text-gray-300'}`}
+                        >
+                          Recruiter
+                        </p>
+                        <p className='text-xs text-gray-500'>Hiring talents</p>
+                      </div>
+                      {role === 'recruiter' && (
+                        <motion.div
+                          layoutId='active-role'
+                          className='absolute -top-1 -right-1 h-4 w-4 rounded-full bg-fuchsia-500'
+                        >
+                          <FiCheck className='h-3 w-3 text-white' />
+                        </motion.div>
+                      )}
+                    </div>
+                  </motion.button>
+                </div>
+              </motion.div>
+
               <AnimatePresence>
                 {formData.password && (
                   <motion.div
@@ -407,7 +508,8 @@ export default function SignUpPage() {
                   </div>
                 ) : (
                   <div className='flex items-center justify-center gap-2'>
-                    Create Account
+                    Create Account as{' '}
+                    {role === 'seeker' ? 'Job Seeker' : 'Recruiter'}
                     <FiArrowRight size={18} />
                   </div>
                 )}
