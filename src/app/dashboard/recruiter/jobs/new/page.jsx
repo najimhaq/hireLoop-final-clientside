@@ -6,45 +6,26 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   FiBriefcase,
   FiMapPin,
-  FiDollarSign,
-  FiCalendar,
-  FiFileText,
   FiCheckCircle,
   FiArrowLeft,
   FiArrowRight,
-  FiGlobe,
-  FiUsers,
-  FiClock,
-  FiAward,
 } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
-// import { createJob } from '@/lib/actions/jobs';
+import { createJob } from '@/app/lib/actions/createJobs';
 
 const steps = [
   { id: 1, name: 'Basic Info', icon: FiBriefcase },
-  { id: 2, name: 'Job Details', icon: FiFileText },
+  { id: 2, name: 'Job Details', icon: FiBriefcase },
   { id: 3, name: 'Requirements', icon: FiCheckCircle },
 ];
 
 const jobCategories = [
-  {
-    value: 'technology',
-    label: '💻 Technology',
-    color: 'from-blue-500 to-cyan-500',
-  },
-  { value: 'design', label: '🎨 Design', color: 'from-purple-500 to-pink-500' },
-  {
-    value: 'marketing',
-    label: '📢 Marketing',
-    color: 'from-orange-500 to-red-500',
-  },
-  { value: 'sales', label: '📈 Sales', color: 'from-green-500 to-emerald-500' },
-  {
-    value: 'finance',
-    label: '💰 Finance',
-    color: 'from-yellow-500 to-amber-500',
-  },
-  { value: 'hr', label: '👥 HR', color: 'from-indigo-500 to-purple-500' },
+  { value: 'technology', label: '💻 Technology' },
+  { value: 'design', label: '🎨 Design' },
+  { value: 'marketing', label: '📢 Marketing' },
+  { value: 'sales', label: '📈 Sales' },
+  { value: 'finance', label: '💰 Finance' },
+  { value: 'hr', label: '👥 HR' },
 ];
 
 const jobTypes = [
@@ -52,13 +33,21 @@ const jobTypes = [
   { value: 'part-time', label: 'Part-time', icon: '⏰' },
   { value: 'contract', label: 'Contract', icon: '📝' },
   { value: 'internship', label: 'Internship', icon: '🎓' },
-  { value: 'remote', label: 'Remote', icon: '🏠' },
+  { value: 'freelance', label: 'Freelance', icon: '🧑‍💻' },
+];
+
+const experienceLevels = [
+  { value: 'entry', label: 'Entry Level (0-2 years)' },
+  { value: 'mid', label: 'Mid Level (3-5 years)' },
+  { value: 'senior', label: 'Senior Level (6+ years)' },
 ];
 
 export default function PostJobPage() {
   const router = useRouter();
+
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     jobTitle: '',
     jobCategory: '',
@@ -78,18 +67,39 @@ export default function PostJobPage() {
 
   const [errors, setErrors] = useState({});
 
+  const inputClass =
+    'w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 transition-all';
+
+  const textareaClass =
+    'w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 transition-all resize-none';
+
+  const clearFieldError = (name) => {
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }));
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === 'checkbox' ? checked : value;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [name]: newValue,
+      };
 
-    // Clear error when user types
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
+      if (name === 'isRemote' && checked) {
+        updated.location = '';
+      }
+
+      return updated;
+    });
+
+    clearFieldError(name);
+
+    if (name === 'isRemote') {
+      clearFieldError('location');
     }
   };
 
@@ -97,40 +107,93 @@ export default function PostJobPage() {
     const newErrors = {};
 
     if (currentStep === 1) {
-      if (!formData.jobTitle) newErrors.jobTitle = 'Job title is required';
-      if (!formData.jobCategory) newErrors.jobCategory = 'Category is required';
-      if (!formData.jobType) newErrors.jobType = 'Job type is required';
-      if (!formData.minSalary) newErrors.minSalary = 'Minimum salary required';
-      if (!formData.maxSalary) newErrors.maxSalary = 'Maximum salary required';
-      if (!formData.isRemote && !formData.location) {
+      if (!formData.jobTitle.trim()) {
+        newErrors.jobTitle = 'Job title is required';
+      }
+
+      if (!formData.jobCategory) {
+        newErrors.jobCategory = 'Category is required';
+      }
+
+      if (!formData.jobType) {
+        newErrors.jobType = 'Job type is required';
+      }
+
+      if (!formData.minSalary) {
+        newErrors.minSalary = 'Minimum salary is required';
+      }
+
+      if (!formData.maxSalary) {
+        newErrors.maxSalary = 'Maximum salary is required';
+      }
+
+      if (formData.minSalary && Number(formData.minSalary) < 0) {
+        newErrors.minSalary = 'Minimum salary must be 0 or more';
+      }
+
+      if (formData.maxSalary && Number(formData.maxSalary) < 0) {
+        newErrors.maxSalary = 'Maximum salary must be 0 or more';
+      }
+
+      if (
+        formData.minSalary &&
+        formData.maxSalary &&
+        Number(formData.maxSalary) < Number(formData.minSalary)
+      ) {
+        newErrors.maxSalary =
+          'Max salary must be greater than or equal to min salary';
+      }
+
+      if (!formData.isRemote && !formData.location.trim()) {
         newErrors.location = 'Location is required for on-site jobs';
       }
-      if (!formData.deadline) newErrors.deadline = 'Deadline is required';
-    } else if (currentStep === 2) {
-      if (!formData.responsibilities)
+
+      if (!formData.deadline) {
+        newErrors.deadline = 'Deadline is required';
+      } else {
+        const selectedDate = new Date(formData.deadline);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (selectedDate < today) {
+          newErrors.deadline = 'Deadline cannot be in the past';
+        }
+      }
+    }
+
+    if (currentStep === 2) {
+      if (!formData.responsibilities.trim()) {
         newErrors.responsibilities = 'Responsibilities are required';
-    } else if (currentStep === 3) {
-      if (!formData.requirements)
+      }
+
+      if (!formData.experienceLevel) {
+        newErrors.experienceLevel = 'Experience level is required';
+      }
+
+      if (!formData.vacancies) {
+        newErrors.vacancies = 'Vacancies is required';
+      } else if (Number(formData.vacancies) < 1) {
+        newErrors.vacancies = 'Vacancies must be at least 1';
+      }
+    }
+
+    if (currentStep === 3) {
+      if (!formData.requirements.trim()) {
         newErrors.requirements = 'Requirements are required';
+      }
     }
 
     setErrors(newErrors);
-
     return Object.keys(newErrors).length === 0;
   };
 
   const nextStep = () => {
-    console.log('Moving to next step from step:', currentStep);
-    console.log('Current form data before next step:', formData);
-
-    if (validateStep()) {
-      setCurrentStep((prev) => prev + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    if (!validateStep()) return;
+    setCurrentStep((prev) => prev + 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const prevStep = () => {
-    console.log('Moving to previous step from step:', currentStep);
     setCurrentStep((prev) => prev - 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -138,59 +201,47 @@ export default function PostJobPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateStep()) {
-      return;
-    }
+    if (!validateStep()) return;
+
     setIsLoading(true);
 
     try {
       const payload = {
-        ...formData,
+        jobTitle: formData.jobTitle.trim(),
+        jobCategory: formData.jobCategory,
+        jobType: formData.jobType,
         minSalary: Number(formData.minSalary),
         maxSalary: Number(formData.maxSalary),
+        currency: formData.currency,
+        location: formData.isRemote ? 'Remote' : formData.location.trim(),
+        isRemote: formData.isRemote,
+        deadline: formData.deadline,
+        responsibilities: formData.responsibilities.trim(),
+        requirements: formData.requirements.trim(),
+        benefits: formData.benefits.trim(),
+        experienceLevel: formData.experienceLevel,
         vacancies: Number(formData.vacancies),
-        companyId: 'company_123',
-        status: 'active',
-        isPubliclyVisible: true,
-        postedAt: new Date().toISOString(),
       };
+      // console.table(payload);
 
+      const res = await createJob(payload);
 
-
-
-      //! console.table(payload);
-
-      // const res = await createJob(payload);
-
-      // console.log('Server response:', res);
-      // console.log('Response insertedId:', res.insertedId);
-
-      // if (res.insertedId) {
-      //   console.log('✅ Job posted successfully!');
-      //   toast.success('Job posted successfully! 🎉');
-      //   router.push('/dashboard/recruiter/jobs');
-      // } else {
-      //   console.log('❌ Failed to post job - no insertedId');
-      //   toast.error('Failed to post job');
-      // }
+      if (res?.success) {
+        toast.success('Job posted successfully! 🎉');
+        router.push('/dashboard/recruiter/jobs');
+      } else {
+        toast.error(res?.message || 'Failed to post job');
+      }
     } catch (error) {
-      console.error('❌ Error posting job:', error);
-      console.error('Error details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-      });
-      toast.error('Failed to post job. Please try again.');
+      toast.error(error.message || 'Failed to post job. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
-  //!  console.log('Initial form data:', formData);
 
   return (
     <div className='min-h-screen bg-linear-to-br from-gray-950 via-black to-gray-950 py-12 px-4 sm:px-6 lg:px-8'>
       <div className='max-w-4xl mx-auto'>
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -202,9 +253,8 @@ export default function PostJobPage() {
           </p>
         </motion.div>
 
-        {/* Step Progress */}
         <div className='mb-8'>
-          <div className='flex items-center justify-between'>
+          <div className='flex items-center justify-between gap-2'>
             {steps.map((step, index) => {
               const Icon = step.icon;
               const isCompleted = currentStep > step.id;
@@ -227,16 +277,22 @@ export default function PostJobPage() {
                         <FiCheckCircle className='w-6 h-6 text-white' />
                       ) : (
                         <Icon
-                          className={`w-6 h-6 ${isCurrent ? 'text-white' : 'text-gray-500'}`}
+                          className={`w-6 h-6 ${
+                            isCurrent ? 'text-white' : 'text-gray-500'
+                          }`}
                         />
                       )}
                     </motion.div>
+
                     <span
-                      className={`mt-2 text-sm font-medium ${isCurrent ? 'text-white' : 'text-gray-500'}`}
+                      className={`mt-2 text-sm font-medium text-center ${
+                        isCurrent ? 'text-white' : 'text-gray-500'
+                      }`}
                     >
                       {step.name}
                     </span>
                   </div>
+
                   {index < steps.length - 1 && (
                     <div
                       className={`absolute top-6 left-1/2 w-full h-0.5 -translate-y-1/2 ${
@@ -252,7 +308,6 @@ export default function PostJobPage() {
           </div>
         </div>
 
-        {/* Form Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -260,7 +315,6 @@ export default function PostJobPage() {
         >
           <form onSubmit={handleSubmit}>
             <AnimatePresence mode='wait'>
-              {/* Step 1: Basic Information */}
               {currentStep === 1 && (
                 <motion.div
                   key='step1'
@@ -269,7 +323,6 @@ export default function PostJobPage() {
                   exit={{ opacity: 0, x: -20 }}
                   className='space-y-6'
                 >
-                  {/* Job Title */}
                   <div>
                     <label className='block text-sm font-medium text-gray-300 mb-2'>
                       Job Title *
@@ -280,7 +333,7 @@ export default function PostJobPage() {
                       value={formData.jobTitle}
                       onChange={handleChange}
                       placeholder='e.g., Senior Frontend Developer'
-                      className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 transition-all'
+                      className={inputClass}
                     />
                     {errors.jobTitle && (
                       <p className='mt-1 text-xs text-red-400'>
@@ -290,7 +343,6 @@ export default function PostJobPage() {
                   </div>
 
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                    {/* Category */}
                     <div>
                       <label className='block text-sm font-medium text-gray-300 mb-2'>
                         Category *
@@ -299,11 +351,15 @@ export default function PostJobPage() {
                         name='jobCategory'
                         value={formData.jobCategory}
                         onChange={handleChange}
-                        className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-violet-500 transition-all'
+                        className={inputClass}
                       >
                         <option value=''>Select category</option>
                         {jobCategories.map((cat) => (
-                          <option key={cat.value} value={cat.value}>
+                          <option
+                            key={cat.value}
+                            value={cat.value}
+                            className='bg-gray-900 text-white'
+                          >
                             {cat.label}
                           </option>
                         ))}
@@ -315,7 +371,6 @@ export default function PostJobPage() {
                       )}
                     </div>
 
-                    {/* Job Type */}
                     <div>
                       <label className='block text-sm font-medium text-gray-300 mb-2'>
                         Job Type *
@@ -326,11 +381,11 @@ export default function PostJobPage() {
                             key={type.value}
                             type='button'
                             onClick={() => {
-                              console.log(`Selected job type: ${type.value}`);
                               setFormData((prev) => ({
                                 ...prev,
                                 jobType: type.value,
                               }));
+                              clearFieldError('jobType');
                             }}
                             className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                               formData.jobType === type.value
@@ -338,7 +393,7 @@ export default function PostJobPage() {
                                 : 'bg-white/5 text-gray-300 hover:bg-white/10'
                             }`}
                           >
-                            <span className='mr-1'>{type.icon}</span>{' '}
+                            <span className='mr-1'>{type.icon}</span>
                             {type.label}
                           </button>
                         ))}
@@ -351,53 +406,73 @@ export default function PostJobPage() {
                     </div>
                   </div>
 
-                  {/* Salary Range */}
                   <div>
                     <label className='block text-sm font-medium text-gray-300 mb-2'>
                       Salary Range *
                     </label>
-                    <div className='grid grid-cols-3 gap-3'>
-                      <div className='col-span-1'>
+                    <div className='grid grid-cols-1 md:grid-cols-3 gap-3'>
+                      <div>
                         <select
                           name='currency'
                           value={formData.currency}
                           onChange={handleChange}
-                          className='w-full px-3 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-violet-500'
+                          className={inputClass}
                         >
-                          <option value='USD'>USD ($)</option>
-                          <option value='EUR'>EUR (€)</option>
-                          <option value='GBP'>GBP (£)</option>
+                          <option
+                            value='USD'
+                            className='bg-gray-900 text-white'
+                          >
+                            USD ($)
+                          </option>
+                          <option
+                            value='EUR'
+                            className='bg-gray-900 text-white'
+                          >
+                            EUR (€)
+                          </option>
+                          <option
+                            value='GBP'
+                            className='bg-gray-900 text-white'
+                          >
+                            GBP (£)
+                          </option>
                         </select>
                       </div>
-                      <div className='col-span-1'>
+
+                      <div>
                         <input
                           type='number'
                           name='minSalary'
                           value={formData.minSalary}
                           onChange={handleChange}
                           placeholder='Min'
-                          className='w-full px-3 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-violet-500'
+                          className={inputClass}
                         />
+                        {errors.minSalary && (
+                          <p className='mt-1 text-xs text-red-400'>
+                            {errors.minSalary}
+                          </p>
+                        )}
                       </div>
-                      <div className='col-span-1'>
+
+                      <div>
                         <input
                           type='number'
                           name='maxSalary'
                           value={formData.maxSalary}
                           onChange={handleChange}
                           placeholder='Max'
-                          className='w-full px-3 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-violet-500'
+                          className={inputClass}
                         />
+                        {errors.maxSalary && (
+                          <p className='mt-1 text-xs text-red-400'>
+                            {errors.maxSalary}
+                          </p>
+                        )}
                       </div>
                     </div>
-                    {(errors.minSalary || errors.maxSalary) && (
-                      <p className='mt-1 text-xs text-red-400'>
-                        Salary range is required
-                      </p>
-                    )}
                   </div>
 
-                  {/* Location & Remote */}
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                     <div>
                       <label className='block text-sm font-medium text-gray-300 mb-2'>
@@ -428,19 +503,21 @@ export default function PostJobPage() {
 
                     <div>
                       <label className='block text-sm font-medium text-gray-300 mb-2'>
+                        Work Mode
+                      </label>
+                      <label className='inline-flex items-center gap-2 text-white cursor-pointer mt-3'>
                         <input
                           type='checkbox'
                           name='isRemote'
                           checked={formData.isRemote}
                           onChange={handleChange}
-                          className='mr-2'
+                          className='h-4 w-4'
                         />
-                        Remote Position
+                        <span>Remote Position</span>
                       </label>
                     </div>
                   </div>
 
-                  {/* Deadline */}
                   <div>
                     <label className='block text-sm font-medium text-gray-300 mb-2'>
                       Application Deadline *
@@ -450,7 +527,7 @@ export default function PostJobPage() {
                       name='deadline'
                       value={formData.deadline}
                       onChange={handleChange}
-                      className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-violet-500 transition-all'
+                      className={inputClass}
                     />
                     {errors.deadline && (
                       <p className='mt-1 text-xs text-red-400'>
@@ -461,7 +538,6 @@ export default function PostJobPage() {
                 </motion.div>
               )}
 
-              {/* Step 2: Job Details */}
               {currentStep === 2 && (
                 <motion.div
                   key='step2'
@@ -479,8 +555,10 @@ export default function PostJobPage() {
                       value={formData.responsibilities}
                       onChange={handleChange}
                       rows={6}
-                      placeholder='• Lead development of new features&#10;• Collaborate with cross-functional teams&#10;• Write clean, maintainable code&#10;• Conduct code reviews'
-                      className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 transition-all resize-none'
+                      placeholder={
+                        '• Lead development of new features\n• Collaborate with cross-functional teams\n• Write clean, maintainable code\n• Conduct code reviews'
+                      }
+                      className={textareaClass}
                     />
                     {errors.responsibilities && (
                       <p className='mt-1 text-xs text-red-400'>
@@ -498,33 +576,45 @@ export default function PostJobPage() {
                       value={formData.benefits}
                       onChange={handleChange}
                       rows={4}
-                      placeholder='• Competitive salary&#10;• Health insurance&#10;• 401(k) matching&#10;• Remote work flexibility'
-                      className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 transition-all resize-none'
+                      placeholder={
+                        '• Competitive salary\n• Health insurance\n• Remote work flexibility\n• Paid time off'
+                      }
+                      className={textareaClass}
                     />
                   </div>
 
-                  <div className='grid grid-cols-2 gap-6'>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                     <div>
                       <label className='block text-sm font-medium text-gray-300 mb-2'>
-                        Experience Level
+                        Experience Level *
                       </label>
                       <select
                         name='experienceLevel'
                         value={formData.experienceLevel}
                         onChange={handleChange}
-                        className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-violet-500'
+                        className={inputClass}
                       >
                         <option value=''>Select level</option>
-                        <option value='entry'>Entry Level (0-2 years)</option>
-                        <option value='mid'>Mid Level (3-5 years)</option>
-                        <option value='senior'>Senior Level (6-9 years)</option>
-                        <option value='lead'>Lead/Manager (10+ years)</option>
+                        {experienceLevels.map((level) => (
+                          <option
+                            key={level.value}
+                            value={level.value}
+                            className='bg-gray-900 text-white'
+                          >
+                            {level.label}
+                          </option>
+                        ))}
                       </select>
+                      {errors.experienceLevel && (
+                        <p className='mt-1 text-xs text-red-400'>
+                          {errors.experienceLevel}
+                        </p>
+                      )}
                     </div>
 
                     <div>
                       <label className='block text-sm font-medium text-gray-300 mb-2'>
-                        Number of Vacancies
+                        Number of Vacancies *
                       </label>
                       <input
                         type='number'
@@ -532,14 +622,18 @@ export default function PostJobPage() {
                         value={formData.vacancies}
                         onChange={handleChange}
                         min='1'
-                        className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-violet-500'
+                        className={inputClass}
                       />
+                      {errors.vacancies && (
+                        <p className='mt-1 text-xs text-red-400'>
+                          {errors.vacancies}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </motion.div>
               )}
 
-              {/* Step 3: Requirements */}
               {currentStep === 3 && (
                 <motion.div
                   key='step3'
@@ -557,8 +651,10 @@ export default function PostJobPage() {
                       value={formData.requirements}
                       onChange={handleChange}
                       rows={8}
-                      placeholder="• Bachelor's degree in Computer Science or related field&#10;• 5+ years of experience in React development&#10;• Strong knowledge of JavaScript/TypeScript&#10;• Experience with Node.js and REST APIs&#10;• Excellent problem-solving skills"
-                      className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 transition-all resize-none'
+                      placeholder={
+                        "• Bachelor's degree in Computer Science or related field\n• Strong knowledge of React and JavaScript\n• Experience with REST APIs\n• Good communication skills"
+                      }
+                      className={textareaClass}
                     />
                     {errors.requirements && (
                       <p className='mt-1 text-xs text-red-400'>
@@ -567,16 +663,17 @@ export default function PostJobPage() {
                     )}
                   </div>
 
-                  {/* Summary */}
                   <div className='mt-8 p-4 bg-white/5 rounded-xl border border-white/10'>
                     <h3 className='text-lg font-semibold text-white mb-3'>
                       Job Summary
                     </h3>
+
                     <div className='space-y-2 text-sm'>
                       <p className='text-gray-300'>
                         <span className='text-white font-medium'>Title:</span>{' '}
                         {formData.jobTitle || 'Not set'}
                       </p>
+
                       <p className='text-gray-300'>
                         <span className='text-white font-medium'>
                           Category:
@@ -585,16 +682,19 @@ export default function PostJobPage() {
                           (c) => c.value === formData.jobCategory
                         )?.label || 'Not set'}
                       </p>
+
                       <p className='text-gray-300'>
                         <span className='text-white font-medium'>Type:</span>{' '}
                         {formData.jobType || 'Not set'}
                       </p>
+
                       <p className='text-gray-300'>
                         <span className='text-white font-medium'>Salary:</span>{' '}
                         {formData.minSalary && formData.maxSalary
                           ? `${formData.currency} ${formData.minSalary} - ${formData.maxSalary}`
                           : 'Not set'}
                       </p>
+
                       <p className='text-gray-300'>
                         <span className='text-white font-medium'>
                           Location:
@@ -603,15 +703,35 @@ export default function PostJobPage() {
                           ? 'Remote'
                           : formData.location || 'Not set'}
                       </p>
+
+                      <p className='text-gray-300'>
+                        <span className='text-white font-medium'>
+                          Experience:
+                        </span>{' '}
+                        {formData.experienceLevel || 'Not set'}
+                      </p>
+
+                      <p className='text-gray-300'>
+                        <span className='text-white font-medium'>
+                          Vacancies:
+                        </span>{' '}
+                        {formData.vacancies || 'Not set'}
+                      </p>
+
+                      <p className='text-gray-300'>
+                        <span className='text-white font-medium'>
+                          Deadline:
+                        </span>{' '}
+                        {formData.deadline || 'Not set'}
+                      </p>
                     </div>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* Navigation Buttons */}
             <div className='flex justify-between gap-4 mt-8 pt-6 border-t border-white/10'>
-              {currentStep > 1 && (
+              {currentStep > 1 ? (
                 <button
                   type='button'
                   onClick={prevStep}
@@ -620,6 +740,8 @@ export default function PostJobPage() {
                   <FiArrowLeft size={18} />
                   Back
                 </button>
+              ) : (
+                <div />
               )}
 
               {currentStep < steps.length ? (

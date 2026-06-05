@@ -24,62 +24,44 @@ import { Button, Badge } from '@heroui/react';
 import { signOut, useSession } from '@/app/lib/auth-client';
 import toast from 'react-hot-toast';
 import UseAvater from '../UseAvater';
+import { IoCreateOutline } from 'react-icons/io5';
 
 const navItems = [
   {
     icon: FiHome,
     label: 'Dashboard',
-    href: '/dashboard',
+    href: '/dashboard/recruiter',
   },
   {
     icon: FiBriefcase,
     label: 'Jobs',
-    href: '/dashboard/jobs',
+    href: '/dashboard/recruiter/jobs',
   },
   {
-    icon: FiSearch,
-    label: 'Browse',
-    href: '/dashboard/browse',
+    icon: IoCreateOutline ,
+    label: 'Create A Job',
+    href: '/dashboard/recruiter/jobs/new',
   },
   {
     icon: FiUsers,
     label: 'Candidates',
-    href: '/dashboard/candidates',
+    href: '/dashboard/recruiter/candidates',
   },
   {
     icon: FiFileText,
     label: 'Applications',
-    href: '/dashboard/applications',
+    href: '/dashboard/recruiter/applications',
   },
-  {
-    icon: FiBarChart2,
-    label: 'Analytics',
-    href: '/dashboard/analytics',
-  },
-  {
-    icon: FiStar,
-    label: 'Saved',
-    href: '/dashboard/saved',
-  },
-  {
-    icon: FiMail,
-    label: 'Messages',
-    href: '/dashboard/messages',
-  },
-  {
-    icon: FiBell,
-    label: 'Notifications',
-    href: '/dashboard/notifications',
-  },
+
   {
     icon: FiUser,
-    label: 'Profile',
-    href: '/dashboard/profile',
+    label: 'Company Profile',
+    href: '/dashboard/recruiter/company',
   },
   {
     icon: FiSettings,
     label: 'Settings',
-    href: '/dashboard/settings',
+    href: '/dashboard/recruiter/settings',
   },
 ];
 
