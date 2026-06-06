@@ -1,15 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   FiLogOut,
   FiHome,
-  FiSearch,
-  FiBell,
-  FiMail,
   FiUser,
   FiSettings,
   FiBriefcase,
@@ -23,8 +20,8 @@ import {
 import { Button, Badge } from '@heroui/react';
 import { signOut, useSession } from '@/app/lib/auth-client';
 import toast from 'react-hot-toast';
-import UseAvater from '../UseAvater';
 import { IoCreateOutline } from 'react-icons/io5';
+import dynamic from 'next/dynamic';
 
 const navItems = [
   {
@@ -38,7 +35,7 @@ const navItems = [
     href: '/dashboard/recruiter/jobs',
   },
   {
-    icon: IoCreateOutline ,
+    icon: IoCreateOutline,
     label: 'Create A Job',
     href: '/dashboard/recruiter/jobs/new',
   },
@@ -65,13 +62,21 @@ const navItems = [
   },
 ];
 
+const UseAvater = dynamic(() => import('../UseAvater'), {
+  ssr: false,
+});
+
 export function DashboardSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
   const user = session?.user;
+  const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -191,7 +196,7 @@ export function DashboardSidebar() {
     <>
       {/* Desktop Sidebar */}
       <motion.aside
-        initial={{ x: -280, opacity: 0 }}
+        initial={false}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.5, type: 'spring', stiffness: 100 }}
         className='hidden h-[calc(100vh-6rem)] w-72 flex-col border-r border-white/10 bg-linear-to-b from-black via-gray-950 to-black lg:mt-24 lg:flex'
@@ -205,10 +210,12 @@ export function DashboardSidebar() {
             <UseAvater className='h-10 w-10' user={user} />
             <div className='flex-1'>
               <p className='text-sm font-medium text-white'>
-                {user?.name || 'User'}
+                {mounted ? user?.name || 'User' : 'User'}
               </p>
               <p className='text-xs text-gray-500'>
-                {user?.email || 'user@example.com'}
+                {mounted
+                  ? user?.email || 'user@example.com'
+                  : 'user@example.com'}
               </p>
             </div>
           </motion.div>

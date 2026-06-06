@@ -1,3 +1,4 @@
+// src/app/dashboard/recruiter/jobs/page.jsx
 import React from 'react';
 import getCompanyJobs from '@/app/lib/api/getCompanyJobs';
 import {
@@ -10,12 +11,15 @@ import {
   FiGrid,
   FiList,
 } from 'react-icons/fi';
+import { getLoggedInRecruiterCompany } from '@/app/lib/api/companies';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
 const RecruiterJobs = async () => {
-  const companyId = 'company_123';
-  const jobs = await getCompanyJobs(companyId);
+  const company = await getLoggedInRecruiterCompany();
+  console.log('company' ,company.data)
+  const jobs = await getCompanyJobs(company.data._id) || [];
 
   const getStatusClasses = (status) => {
     switch (status?.toLowerCase()) {
@@ -280,10 +284,10 @@ const RecruiterJobs = async () => {
                         <p className='mt-2 text-sm text-slate-500'>
                           Get started by creating your first job posting
                         </p>
-                        <button className='mt-6 inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-purple-600 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-purple-200 transition-all hover:shadow-xl'>
+                        <Link href='/dashboard/recruiter/jobs/new' className='mt-6 inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-purple-600 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-purple-200 transition-all hover:shadow-xl'>
                           Create Job Posting
                           <FiBriefcase className='h-4 w-4' />
-                        </button>
+                        </Link>
                       </div>
                     </td>
                   </tr>

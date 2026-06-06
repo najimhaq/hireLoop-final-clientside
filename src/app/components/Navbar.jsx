@@ -6,6 +6,8 @@ import { Button } from '@heroui/react';
 import { AnimatePresence, motion } from 'motion/react';
 import { signOut, useSession } from '../lib/auth-client';
 import UseAvater from './UseAvater';
+import Image from 'next/image';
+
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -35,18 +37,22 @@ export default function Navbar() {
         <div className='flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8'>
           {/* LOGO */}
           <Link href='/' className='flex items-center gap-3'>
-            <div className='relative flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br from-violet-600 via-fuchsia-500 to-purple-500 shadow-lg'>
-              <div className='absolute inset-0 rounded-2xl bg-white/10' />
-              <span className='relative text-xl font-bold text-white'>P</span>
-            </div>
-
-            <div className='hidden leading-none sm:block'>
-              <h1 className='text-lg font-semibold tracking-tight text-white'>
-                Hire Loop
-              </h1>
-              <p className='mt-1 text-xs text-white/45'>
-                Find work with clarity
-              </p>
+            <div className='leading-none'>
+              <Image
+                src='/images/logo.png'
+                alt='Hire Loop Logo'
+                width={80} // mobile default
+                height={32}
+                priority
+                className='block sm:hidden' // mobile only
+              />
+              <Image
+                src='/images/logo.png'
+                alt='Hire Loop Logo'
+                width={100} // desktop
+                height={40}
+                className='hidden sm:block logo' // desktop only
+              />
             </div>
           </Link>
 
