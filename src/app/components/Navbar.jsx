@@ -8,7 +8,6 @@ import { signOut, useSession } from '../lib/auth-client';
 import UseAvater from './UseAvater';
 import Image from 'next/image';
 
-
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hovered, setHovered] = useState(null);
@@ -22,12 +21,12 @@ export default function Navbar() {
 
   const navLinks = [
     { label: 'Browse Jobs', href: '/jobs' },
-    { label: 'Company', href: '/company' },
+    { label: 'Companies', href: '/companies' },
     { label: 'Pricing', href: '/pricing' },
   ];
 
   return (
-    <div className='sticky top-4 z-50 px-4 sm:px-6 lg:px-8'>
+    <header className='sticky top-4 z-50 px-4 pb-6 sm:px-6 lg:px-8'>
       <motion.nav
         initial={{ opacity: 0, y: -24 }}
         animate={{ opacity: 1, y: 0 }}
@@ -52,6 +51,7 @@ export default function Navbar() {
                 width={100} // desktop
                 height={40}
                 className='hidden sm:block logo' // desktop only
+                priority
               />
             </div>
           </Link>
@@ -244,6 +244,6 @@ export default function Navbar() {
           )}
         </AnimatePresence>
       </motion.nav>
-    </div>
+    </header>
   );
 }

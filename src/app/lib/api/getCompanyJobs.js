@@ -1,6 +1,8 @@
+import { serverFetch } from '../core/server';
+
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
-const getCompanyJobs = async (companyId, status = 'active') => {
+export const getCompanyJobs = async (companyId, status = 'active') => {
   try {
     const response = await fetch(
       `${baseUrl}/api/jobs?companyId=${companyId}&status=${status}`,
@@ -21,4 +23,12 @@ const getCompanyJobs = async (companyId, status = 'active') => {
   }
 };
 
-export default getCompanyJobs;
+//get single job
+export const getCompanyJobById = async (jobId) => {
+  return serverFetch(`/api/jobs/${jobId}`);
+}
+export const getBrowseCompanyJobs = async (companyId) => {
+  return serverFetch(`/api/jobs`);
+};
+
+//return serverFetch(`/api/jobs?companyId=${companyId}&status=active`);

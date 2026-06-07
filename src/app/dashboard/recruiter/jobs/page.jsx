@@ -1,6 +1,6 @@
 // src/app/dashboard/recruiter/jobs/page.jsx
 import React from 'react';
-import getCompanyJobs from '@/app/lib/api/getCompanyJobs';
+
 import {
   FiEye,
   FiEdit2,
@@ -13,6 +13,7 @@ import {
 } from 'react-icons/fi';
 import { getLoggedInRecruiterCompany } from '@/app/lib/api/companies';
 import Link from 'next/link';
+import { getCompanyJobs } from '@/app/lib/api/getCompanyJobs';
 
 export const dynamic = 'force-dynamic';
 

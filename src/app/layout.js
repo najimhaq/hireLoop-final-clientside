@@ -23,16 +23,13 @@ export default function RootLayout({ children }) {
       suppressHydrationWarning
       className={`${manrope.className} dark`}
     >
-      <body className='flex min-h-screen flex-col antialiased'>
-        <header className='fixed top-0 left-0 right-0 z-50'>
-          {/* Nav */}
-          <Navbar />
-        </header>
+      <body className='flex min-h-screen flex-col bg-black antialiased'>
+        <Navbar />
 
         <main className='grow'>
-          <div className='max-w-full mx-auto'>{children}</div>
+          <div className='mx-auto max-w-full'>{children}</div>
         </main>
-        {/* footer */}
+
         <Footer />
         <Toaster position='top-right' />
       </body>

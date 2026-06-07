@@ -241,7 +241,7 @@ export default function SignUpPage() {
         email: formData.email,
         password: formData.password,
         name: formData.name,
-        role: role,
+        role,
         image: formData.imageUrl || undefined,
         callbackURL: '/',
       });
@@ -252,8 +252,8 @@ export default function SignUpPage() {
       }
 
       toast.success(`Account created successfully as ${role}!`);
-      router.push('/signin');
-    } catch {
+      router.replace('/signin');
+    } catch (error) {
       toast.error('Something went wrong');
     } finally {
       setIsLoading(false);

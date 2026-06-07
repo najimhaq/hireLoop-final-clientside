@@ -10,10 +10,8 @@ import {
   FiUser,
   FiSettings,
   FiBriefcase,
-  FiBarChart2,
   FiUsers,
   FiFileText,
-  FiStar,
   FiMenu,
   FiX,
 } from 'react-icons/fi';
@@ -24,16 +22,8 @@ import { IoCreateOutline } from 'react-icons/io5';
 import dynamic from 'next/dynamic';
 
 const navItems = [
-  {
-    icon: FiHome,
-    label: 'Dashboard',
-    href: '/dashboard/recruiter',
-  },
-  {
-    icon: FiBriefcase,
-    label: 'Jobs',
-    href: '/dashboard/recruiter/jobs',
-  },
+  { icon: FiHome, label: 'Dashboard', href: '/dashboard/recruiter' },
+  { icon: FiBriefcase, label: 'Jobs', href: '/dashboard/recruiter/jobs' },
   {
     icon: IoCreateOutline,
     label: 'Create A Job',
@@ -49,7 +39,6 @@ const navItems = [
     label: 'Applications',
     href: '/dashboard/recruiter/applications',
   },
-
   {
     icon: FiUser,
     label: 'Company Profile',
@@ -62,14 +51,12 @@ const navItems = [
   },
 ];
 
-const UseAvater = dynamic(() => import('../UseAvater'), {
-  ssr: false,
-});
+const UseAvater = dynamic(() => import('../UseAvater'), { ssr: false });
 
 export function DashboardSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const user = session?.user;
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -77,15 +64,19 @@ export function DashboardSidebar() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
   const handleSignOut = async () => {
     try {
       await signOut();
       toast.success('Signed out successfully');
       router.push('/');
-    } catch (error) {
+    } catch {
       toast.error('Failed to sign out');
     }
   };
+
+  if (!mounted || isPending) return null;
+  if (!user) return null;
 
   const NavItem = ({ item, index, onClick }) => {
     const isActive = pathname === item.href;
@@ -125,7 +116,6 @@ export function DashboardSidebar() {
               className={`relative ${isActive ? 'text-violet-400' : 'text-gray-500'}`}
             >
               <Icon className='size-5' />
-
               {(item.label === 'Messages' ||
                 item.label === 'Notifications') && (
                 <Badge
@@ -194,7 +184,6 @@ export function DashboardSidebar() {
 
   return (
     <>
-      {/* Desktop Sidebar */}
       <motion.aside
         initial={false}
         animate={{ x: 0, opacity: 1 }}
@@ -210,12 +199,10 @@ export function DashboardSidebar() {
             <UseAvater className='h-10 w-10' user={user} />
             <div className='flex-1'>
               <p className='text-sm font-medium text-white'>
-                {mounted ? user?.name || 'User' : 'User'}
+                {user?.name || 'User'}
               </p>
               <p className='text-xs text-gray-500'>
-                {mounted
-                  ? user?.email || 'user@example.com'
-                  : 'user@example.com'}
+                {user?.email || 'user@example.com'}
               </p>
             </div>
           </motion.div>
@@ -230,7 +217,6 @@ export function DashboardSidebar() {
         </div>
       </motion.aside>
 
-      {/* Mobile Header */}
       <div className='sticky top-0 z-50 flex items-center justify-between border-b border-white/10 bg-black/80 px-4 py-3 backdrop-blur-xl lg:hidden'>
         <Link href='/dashboard' className='flex items-center gap-2'>
           <motion.div
@@ -252,7 +238,6 @@ export function DashboardSidebar() {
         </Button>
       </div>
 
-      {/* Mobile Sidebar */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
