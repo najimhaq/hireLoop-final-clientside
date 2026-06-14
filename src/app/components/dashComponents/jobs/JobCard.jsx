@@ -14,6 +14,7 @@ const safeId = (value) => {
   return String(value);
 };
 
+
 const formatSalary = (amount) => {
   const numericAmount = Number(amount);
   if (!Number.isFinite(numericAmount) || numericAmount <= 0) return null;
@@ -27,7 +28,7 @@ const formatSalary = (amount) => {
 };
 
 export default function JobCard({ job }) {
-  console.log('Jobcard page:', job)
+  // console.log('Jobcard page:', job)
   if (!job || typeof job !== 'object') return null;
 
   const companyName = safeText(job.companyName, 'Confidential');

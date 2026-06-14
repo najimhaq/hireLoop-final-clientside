@@ -6,7 +6,7 @@ export default async function BrowseJobs() {
   const jobs = await getBrowseCompanyJobs();
 
   return (
-    <div className='w-full min-h-screen bg-zinc-950 p-6 lg:mt-16 md:p-12 text-white'>
+    <div className='w-full min-h-screen bg-zinc-950 p-6 md:p-12 text-white'>
       <div className='max-w-7xl mx-auto mb-10'>
         <h1 className='bg-linear-to-r from-violet-400 via-pink-400 to-fuchsia-600 bg-clip-text text-transparent text-4xl font-bold tracking-tight'>
           Open Positions

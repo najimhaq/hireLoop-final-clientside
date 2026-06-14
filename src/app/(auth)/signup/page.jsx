@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'motion/react';
 import {
   FiMail,
@@ -20,7 +20,6 @@ import {
 } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { FaGithub } from 'react-icons/fa';
-import { Radio, RadioGroup } from '@heroui/react';
 import toast from 'react-hot-toast';
 import { signUp } from '@/app/lib/auth-client';
 
@@ -120,6 +119,9 @@ function InputField({
 
 export default function SignUpPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const rawRedirect = searchParams.get('redirect');
+  const redirect = rawRedirect && rawRedirect !== 'null' ? rawRedirect : '/';
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -252,7 +254,7 @@ export default function SignUpPage() {
       }
 
       toast.success(`Account created successfully as ${role}!`);
-      router.replace('/signin');
+      router.replace(redirect);
     } catch (error) {
       toast.error('Something went wrong');
     } finally {
@@ -265,11 +267,11 @@ export default function SignUpPage() {
       <div className='absolute inset-0 overflow-hidden'>
         <motion.div
           {...floatingOrb(20)}
-          className='absolute -left-1/4 -top-1/4 h-[500px] w-[500px] rounded-full bg-violet-600/20 blur-[100px]'
+          className='absolute -left-1/4 -top-1/4 h-125 w-125 rounded-full bg-violet-600/20 blur-[100px]'
         />
         <motion.div
           {...floatingOrb(15)}
-          className='absolute -bottom-1/4 -right-1/4 h-[500px] w-[500px] rounded-full bg-fuchsia-600/20 blur-[100px]'
+          className='absolute -bottom-1/4 -right-1/4 h-125 w-125 rounded-full bg-fuchsia-600/20 blur-125'
         />
       </div>
 
@@ -559,7 +561,11 @@ export default function SignUpPage() {
               <p className='text-gray-400'>
                 Already have an account?{' '}
                 <Link
-                  href='/signin'
+                  href={
+                    redirect !== '/'
+                      ? `/signin?redirect=${redirect}`
+                      : '/signin'
+                  }
                   className='font-medium text-violet-400 transition hover:text-violet-300'
                 >
                   Sign in

@@ -1,4 +1,5 @@
 import { getCompanyJobById } from '@/app/lib/api/getCompanyJobs';
+import Link from 'next/link';
 import {
   FiMapPin,
   FiBriefcase,
@@ -99,10 +100,10 @@ const JobDetailsPage = async ({ params }) => {
                     <FiBookmark className='h-4 w-4' />
                     Save
                   </button>
-                  <button className='inline-flex h-11 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-black transition hover:bg-zinc-200'>
-                    Apply now
+                  <Link href={`/jobs/${id}/apply`} className='inline-flex h-11 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-black transition hover:bg-zinc-200'>
+                    Apply this job
                     <FiArrowUpRight className='h-4 w-4' />
-                  </button>
+                  </Link>
                 </div>
               </div>
 
