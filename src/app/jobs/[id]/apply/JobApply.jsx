@@ -12,11 +12,11 @@ import {
   FiLink,
 } from 'react-icons/fi';
 
-const initialState = (job) => ({
+const initialState = (job, user) => ({
   jobId: job?._id || job?.id || '',
   jobTitle: job?.jobTitle || '',
-  applicantName: '',
-  applicantEmail: '',
+  applicantName: user?.name || user?.fullName || '',
+  applicantEmail: user?.email || '',
   phone: '',
   linkedinUrl: '',
   resumeUrl: '',
@@ -24,7 +24,7 @@ const initialState = (job) => ({
 });
 
 export default function JobApply({ job, user }) {
-  const [formData, setFormData] = useState(initialState(job));
+  const [formData, setFormData] = useState(initialState(job, user));
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
@@ -58,9 +58,8 @@ export default function JobApply({ job, user }) {
     try {
       await submitApplication(formData);
       toast.success('Application submitted successfully!');
-      setFormData(initialState(job));
+      setFormData(initialState(job, user));
     } catch (error) {
-      // console.log('🔴 error.message:', error.message); 
       toast.error(error.message || 'Something went wrong');
     } finally {
       setIsSubmitting(false);
@@ -89,6 +88,7 @@ export default function JobApply({ job, user }) {
         <input type='hidden' name='jobTitle' value={formData.jobTitle} />
 
         <div className='grid gap-5 md:grid-cols-2'>
+          {/* Full Name */}
           <div>
             <label className='mb-2 block text-sm font-medium text-zinc-300'>
               Full name
@@ -101,12 +101,14 @@ export default function JobApply({ job, user }) {
                 value={formData.applicantName}
                 onChange={handleChange}
                 placeholder='Your full name'
-                className='w-full rounded-2xl border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-white/20 focus:bg-white/7'
+                readOnly={!!user?.name || !!user?.fullName}
+                className='w-full rounded-2xl border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-white/20 focus:bg-white/[0.07] read-only:cursor-not-allowed read-only:opacity-60'
                 required
               />
             </div>
           </div>
 
+          {/* Email */}
           <div>
             <label className='mb-2 block text-sm font-medium text-zinc-300'>
               Email address
@@ -119,7 +121,8 @@ export default function JobApply({ job, user }) {
                 value={formData.applicantEmail}
                 onChange={handleChange}
                 placeholder='you@example.com'
-                className='w-full rounded-2xl border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-white/20 focus:bg-white/7'
+                readOnly={!!user?.email}
+                className='w-full rounded-2xl border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-white/20 focus:bg-white/[0.07] read-only:cursor-not-allowed read-only:opacity-60'
                 required
               />
             </div>
@@ -127,6 +130,7 @@ export default function JobApply({ job, user }) {
         </div>
 
         <div className='grid gap-5 md:grid-cols-2'>
+          {/* Phone */}
           <div>
             <label className='mb-2 block text-sm font-medium text-zinc-300'>
               Phone number
@@ -139,12 +143,13 @@ export default function JobApply({ job, user }) {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder='+8801XXXXXXXXX'
-                className='w-full rounded-2xl border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-white/20 focus:bg-white/7'
+                className='w-full rounded-2xl border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-white/20 focus:bg-white/[0.07]'
                 required
               />
             </div>
           </div>
 
+          {/* LinkedIn */}
           <div>
             <label className='mb-2 block text-sm font-medium text-zinc-300'>
               LinkedIn / Portfolio
@@ -158,12 +163,13 @@ export default function JobApply({ job, user }) {
                 value={formData.linkedinUrl}
                 onChange={handleChange}
                 placeholder='https://linkedin.com/in/yourname'
-                className='w-full rounded-2xl border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-white/20 focus:bg-white/7'
+                className='w-full rounded-2xl border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-white/20 focus:bg-white/[0.07]'
               />
             </div>
           </div>
         </div>
 
+        {/* Resume URL */}
         <div>
           <label className='mb-2 block text-sm font-medium text-zinc-300'>
             Resume URL
@@ -175,10 +181,11 @@ export default function JobApply({ job, user }) {
             value={formData.resumeUrl}
             onChange={handleChange}
             placeholder='https://drive.google.com/... or portfolio resume link'
-            className='w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-white/20 focus:bg-white/7'
+            className='w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-white/20 focus:bg-white/[0.07]'
           />
         </div>
 
+        {/* Cover Letter */}
         <div>
           <label className='mb-2 block text-sm font-medium text-zinc-300'>
             Cover letter
@@ -190,7 +197,7 @@ export default function JobApply({ job, user }) {
             onChange={handleChange}
             rows={6}
             placeholder='Briefly explain why you are a good fit for this role'
-            className='w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-white/20 focus:bg-white/7'
+            className='w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-white/20 focus:bg-white/[0.07]'
           />
         </div>
 

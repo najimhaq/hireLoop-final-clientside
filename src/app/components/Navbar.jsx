@@ -23,6 +23,7 @@ export default function Navbar() {
     { label: 'Browse Jobs', href: '/jobs' },
     { label: 'Companies', href: '/companies' },
     { label: 'Pricing', href: '/pricing' },
+    { label: 'Checkout', href: '/checkout' },
   ];
 
   return (
