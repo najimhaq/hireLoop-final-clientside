@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { signOut, useSession } from '../lib/auth-client';
 import UseAvater from './UseAvater';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,6 +15,12 @@ export default function Navbar() {
   const { data: session } = useSession();
 
   const user = session?.user;
+
+  const pathname = usePathname();
+  // console.log('pathName', pathname)
+  if (pathname.includes('dashboard')) {
+    return null;
+  }
 
   const handleSignOut = async () => {
     await signOut();
@@ -23,7 +30,7 @@ export default function Navbar() {
     { label: 'Browse Jobs', href: '/jobs' },
     { label: 'Companies', href: '/companies' },
     { label: 'Pricing', href: '/pricing' },
-    { label: 'Checkout', href: '/checkout' },
+    { label: 'Dashboard', href: '/dashboard' },
   ];
 
   return (
