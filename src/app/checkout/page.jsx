@@ -37,7 +37,7 @@ export default function CheckoutPage() {
 
   const handleCheckout = async () => {
     setIsProcessing(true);
-    // TODO: await createCheckoutSession(selected) → redirect to Stripe
+
     setTimeout(() => setIsProcessing(false), 1500);
   };
 

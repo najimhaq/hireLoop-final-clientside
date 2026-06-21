@@ -43,7 +43,7 @@ export default function SeekerDashboard() {
         {statCards(user).map((card) => (
           <div
             key={card.label}
-            className='rounded-2xl border border-white/10 bg-white/[0.03] p-5'
+            className='rounded-2xl border border-white/10 bg-white/3 p-5'
           >
             <p className='text-3xl font-bold text-white'>{card.value}</p>
             <p className='mt-1 text-sm font-medium text-slate-300'>
@@ -62,7 +62,7 @@ export default function SeekerDashboard() {
         <div className='grid grid-cols-1 gap-3 sm:grid-cols-3'>
           <Link
             href='/jobs'
-            className='flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition hover:bg-white/[0.06]'
+            className='flex items-center gap-3 rounded-2xl border border-white/10 bg-white/3 p-4 transition hover:bg-white/6'
           >
             <span className='text-xl'>🔍</span>
             <div>
@@ -74,7 +74,7 @@ export default function SeekerDashboard() {
           </Link>
           <Link
             href='/dashboard/seeker/applications'
-            className='flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition hover:bg-white/[0.06]'
+            className='flex items-center gap-3 rounded-2xl border border-white/10 bg-white/3 p-4 transition hover:bg-white/6'
           >
             <span className='text-xl'>📋</span>
             <div>
@@ -84,7 +84,7 @@ export default function SeekerDashboard() {
           </Link>
           <Link
             href='/dashboard/seeker/saved'
-            className='flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition hover:bg-white/[0.06]'
+            className='flex items-center gap-3 rounded-2xl border border-white/10 bg-white/3 p-4 transition hover:bg-white/6'
           >
             <span className='text-xl'>🔖</span>
             <div>

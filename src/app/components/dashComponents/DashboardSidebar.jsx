@@ -11,6 +11,7 @@ const seekerLinks = [
   { href: '/dashboard/seeker/applications', label: 'Applications', icon: '📋' },
   { href: '/dashboard/seeker/saved', label: 'Saved Jobs', icon: '🔖' },
   { href: '/jobs', label: 'Browse Jobs', icon: '🔍' },
+  { href: '/dashboard/seeker/transactions', label: 'Transactions', icon: '💸' },
   { href: '/dashboard/seeker/profile', label: 'My Profile', icon: '👤' },
 ];
 
@@ -19,6 +20,7 @@ const recruiterLinks = [
   { href: '/dashboard/recruiter/jobs', label: 'My Jobs', icon: '💼' },
   { href: '/dashboard/recruiter/post-job', label: 'Post a Job', icon: '📝' },
   { href: '/dashboard/recruiter/applicants', label: 'Applicants', icon: '👥' },
+  { href: '/dashboard/recruiter/transactions', label: 'Transactions', icon: '💸' },
   {
     href: '/dashboard/recruiter/profile',
     label: 'Company Profile',

@@ -64,7 +64,7 @@ export default function ComparisonTable(props) {
             key={feature}
             className={
               'grid grid-cols-4 px-6 py-3.5 text-sm ' +
-              (i % 2 === 0 ? 'bg-white/[0.015]' : '')
+              (i % 2 === 0 ? 'bg-white/1.5' : '')
             }
           >
             <span className='text-zinc-400'>{feature}</span>

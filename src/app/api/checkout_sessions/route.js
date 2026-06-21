@@ -1,17 +1,21 @@
-// app/api/checkout_sessions/route.js
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { stripe } from '@/app/lib/stripe';
+import { getUserSession } from '@/app/lib/core/session';
 
 export async function POST(req) {
   try {
+    const user = await getUserSession();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const headersList = await headers();
     const origin = headersList.get('origin') || process.env.NEXT_PUBLIC_APP_URL;
 
-    // ✅ req.json() দিয়ে planId নাও
     const { planId } = await req.json();
 
-    // ✅ planId দিয়ে real price ID map করো
     const PRICE_IDS = {
       'seeker-pro': 'price_1TjILh2MYZqN1jaWgvygDn49',
       'seeker-enterprise': 'price_1TjINK2MYZqN1jaWgTcA1RLM',
@@ -24,16 +28,23 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
     }
 
-    const session = await stripe.checkout.sessions.create({
+    const checkoutSession = await stripe.checkout.sessions.create({
       line_items: [{ price: priceId, quantity: 1 }],
       mode: 'subscription',
-      success_url: `${origin}/pricing/success?session_id={CHECKOUT_SESSION_ID}`,
+      customer_email: user?.email ?? undefined,
+      metadata: {
+        planId,
+        priceId,
+        userId: user?.id,
+        userEmail: user?.email,
+      },
+      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/pricing`,
     });
 
-    // ✅ redirect নয়, url return করো — frontend থেকে redirect হবে
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: checkoutSession.url });
   } catch (err) {
+    console.error('Checkout error:', err);
     return NextResponse.json(
       { error: err.message },
       { status: err.statusCode || 500 }
