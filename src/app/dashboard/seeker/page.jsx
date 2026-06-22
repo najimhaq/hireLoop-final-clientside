@@ -2,6 +2,7 @@
 import { useSession } from '../../lib/auth-client';
 import { RiseLoader } from 'react-spinners';
 import Link from 'next/link';
+import { FiLock } from 'react-icons/fi';
 
 const statCards = (user) => [
   { label: 'Applications Sent', value: 0, sub: 'Total applied jobs' },
@@ -22,6 +23,28 @@ export default function SeekerDashboard() {
   }
 
   const user = session?.user;
+
+  if (session?.user?.role !== 'seeker') {
+        return (
+          <div className='flex min-h-screen items-center justify-center bg-linear-to-br from-black via-gray-950 to-black px-6'>
+            <div className='w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur-xl'>
+              <div className='mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-violet-500/20'>
+                <FiLock className='h-6 w-6 text-violet-400' />
+              </div>
+              <h1 className='text-2xl font-bold text-white'>Access Restricted</h1>
+              <p className='mt-3 text-gray-400'>
+                You need to sign in as a <span className='font-bold text-xl text-violet-600'>Seeker</span> to view the seeker dashboard.
+              </p>
+              <Link
+                href='/signin'
+                className='mt-6 inline-block rounded-xl bg-violet-600 px-5 py-3 font-medium text-white transition hover:bg-violet-500'
+              >
+                Go to Sign In
+              </Link>
+            </div>
+          </div>
+        );
+      }
 
   return (
     <div className='flex flex-col gap-8'>

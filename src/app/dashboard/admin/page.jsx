@@ -16,7 +16,7 @@ export default function AdminDashboard() {
   }
 
   const user = session?.user;
-  console.log('admin inner', user)
+  // console.log('admin inner', user)
 
   if (session?.user?.role !== 'admin') {
       return (

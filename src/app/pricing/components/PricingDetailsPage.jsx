@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSession } from '@/app/lib/auth-client'; // তোমার auth client
+import { toast } from 'react-hot-toast';
 
 import ComparisonTable from './ComparisonTable';
 import FAQSection from './FAQSection';
@@ -14,7 +16,49 @@ import {
 
 export default function PricingDetailsPage() {
   const { handleCheckout, loadingPlan } = useCheckout();
+  const { data: session } = useSession();
+  const userRole = session?.user?.role; // 'seeker' | 'recruiter' | 'admin'
+
+  // ✅ Role অনুযায়ী initial tab
   const [activeTab, setActiveTab] = useState('seeker');
+
+  useEffect(() => {
+    if (userRole === 'recruiter') {
+      setActiveTab('recruiter');
+    } else {
+      setActiveTab('seeker');
+    }
+  }, [userRole]);
+
+  // ✅ Tab change এ role check
+  const handleTabChange = (tab) => {
+    if (tab === 'recruiter' && userRole === 'seeker') {
+      toast.error('Recruiter plans are not available for Job Seekers.');
+      return;
+    }
+    if (tab === 'seeker' && userRole === 'recruiter') {
+      toast.error('Seeker plans are not available for Recruiters.');
+      return;
+    }
+    setActiveTab(tab);
+  };
+
+  // ✅ Checkout এ role check
+  const handleProtectedCheckout = (planId) => {
+    const isSeekerPlan = seekerPlans.some((p) => p.planId === planId);
+    const isRecruiterPlan = recruiterPlans.some((p) => p.planId === planId);
+
+    if (isSeekerPlan && userRole === 'recruiter') {
+      toast.error('You cannot purchase a Seeker plan as a Recruiter.');
+      return;
+    }
+    if (isRecruiterPlan && userRole === 'seeker') {
+      toast.error('You cannot purchase a Recruiter plan as a Job Seeker.');
+      return;
+    }
+
+    handleCheckout(planId);
+  };
 
   return (
     <>
@@ -24,7 +68,6 @@ export default function PricingDetailsPage() {
           <div className='absolute -top-40 -right-40 w-80 h-80 bg-violet-600/10 rounded-full blur-3xl' />
           <div className='absolute -bottom-40 -left-40 w-80 h-80 bg-fuchsia-600/10 rounded-full blur-3xl' />
         </div>
-
         <div className='container mx-auto px-4 text-center relative z-10'>
           <h1 className='text-4xl md:text-5xl font-bold text-white mb-3'>
             Simple, Transparent
@@ -44,22 +87,26 @@ export default function PricingDetailsPage() {
         {/* Tabs */}
         <div className='flex justify-center gap-4 mb-12'>
           <button
-            onClick={() => setActiveTab('seeker')}
+            onClick={() => handleTabChange('seeker')}
             className={`px-6 py-2.5 rounded-full transition-all text-sm font-medium ${
               activeTab === 'seeker'
                 ? 'bg-linear-to-r from-violet-500 to-fuchsia-500 text-white shadow-lg shadow-violet-500/25'
                 : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
+            } ${
+              // ✅ wrong role হলে disabled look
+              userRole === 'recruiter' ? 'opacity-40 cursor-not-allowed' : ''
             }`}
           >
             🎯 For Job Seekers
           </button>
+
           <button
-            onClick={() => setActiveTab('recruiter')}
+            onClick={() => handleTabChange('recruiter')}
             className={`px-6 py-2.5 rounded-full transition-all text-sm font-medium ${
               activeTab === 'recruiter'
                 ? 'bg-linear-to-r from-violet-500 to-fuchsia-500 text-white shadow-lg shadow-violet-500/25'
                 : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
-            }`}
+            } ${userRole === 'seeker' ? 'opacity-40 cursor-not-allowed' : ''}`}
           >
             🏢 For Recruiters
           </button>
@@ -73,10 +120,8 @@ export default function PricingDetailsPage() {
                 key={plan.id}
                 plan={plan}
                 index={index}
-                accent={
-                  plan.id === 'pro' || plan.id === 'pro' ? 'violet' : 'emerald'
-                }
-                onCheckout={handleCheckout}
+                accent={plan.id === 'pro' ? 'violet' : 'emerald'}
+                onCheckout={handleProtectedCheckout} // ✅ protected checkout
                 isLoading={loadingPlan === plan.planId}
               />
             )
@@ -101,7 +146,6 @@ export default function PricingDetailsPage() {
           />
         </div>
 
-        {/* FAQ Section */}
         <FAQSection />
       </div>
     </>
