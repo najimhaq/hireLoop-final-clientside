@@ -24,7 +24,6 @@ const RecruiterJobs = async () => {
   const jobs = (await getCompanyJobs(company.data._id)) || [];
   console.log('Recruiter page jobs', jobs);
 
-
   const getStatusClasses = (status) => {
     switch (status?.toLowerCase()) {
       case 'active':

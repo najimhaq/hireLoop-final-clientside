@@ -140,7 +140,7 @@ export default function SidebarContent({
       {/* Plan Badge + Sign Out */}
       <div className='space-y-3 border-t border-white/10 px-5 py-4'>
         {role !== 'admin' && (
-          <div className='flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2'>
+          <div className='flex items-center justify-between rounded-xl border border-white/10 bg-white/3 px-3 py-2'>
             <span className='text-xs text-slate-500'>Current Plan</span>
             <span className='text-xs font-semibold capitalize text-white'>
               {user?.plan || 'free'}

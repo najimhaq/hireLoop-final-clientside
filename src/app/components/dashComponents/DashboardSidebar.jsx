@@ -18,7 +18,7 @@ const seekerLinks = [
 const recruiterLinks = [
   { href: '/dashboard/recruiter', label: 'Overview', icon: '🏠' },
   { href: '/dashboard/recruiter/jobs', label: 'My Jobs', icon: '💼' },
-  { href: '/dashboard/recruiter/post-job', label: 'Post a Job', icon: '📝' },
+  { href: '/dashboard/recruiter/jobs/new', label: 'Post a Job', icon: '📝' },
   { href: '/dashboard/recruiter/applicants', label: 'Applicants', icon: '👥' },
   { href: '/dashboard/recruiter/transactions', label: 'Transactions', icon: '💸' },
   {

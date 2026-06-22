@@ -1,3 +1,5 @@
+// app/jobs/[id]/apply/JobApply.jsx
+// app/jobs/[id]/apply/page.jsx - main page
 'use client';
 
 import { submitApplication } from '@/app/lib/actions/applications';

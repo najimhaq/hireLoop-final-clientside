@@ -13,7 +13,6 @@ export const getApplicationByApplicationId = async (applicationId) => {
 };
 
 export const getApplicationsByApplicant = async (userId) => {
-  // এই line টা temporarily console করো
   // console.log('Fetching URL:', `/api/applications/applicant/${userId}`);
 
   const result = await serverFetch(`/api/applications/applicant/${userId}`);

@@ -31,7 +31,7 @@ export const seekerPlans = [
     ctaHref: null,
     features: [
       'Everything in Free',
-      'Unlimited job applications',
+      'Maximum 50 jobs applications',
       'Unlimited saved jobs',
       'Priority application badge',
       'Application tracking dashboard',

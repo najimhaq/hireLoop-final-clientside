@@ -13,22 +13,23 @@ import {
   recruiterComparison,
   seekerComparison,
 } from '../config/comparisonData';
+import { useMounted } from '@/app/hooks/useMounted';
 
 export default function PricingDetailsPage() {
+  const [tabOverride, setTabOverride] = useState(null);
   const { handleCheckout, loadingPlan } = useCheckout();
   const { data: session } = useSession();
   const userRole = session?.user?.role; // 'seeker' | 'recruiter' | 'admin'
 
-  // ✅ Role অনুযায়ী initial tab
-  const [activeTab, setActiveTab] = useState('seeker');
+  const mounted = useMounted()
+  if(!mounted){
+    return null
+  }
 
-  useEffect(() => {
-    if (userRole === 'recruiter') {
-      setActiveTab('recruiter');
-    } else {
-      setActiveTab('seeker');
-    }
-  }, [userRole]);
+  // ✅ Role অনুযায়ী initial tab
+  const activeTab = !mounted
+    ? 'seeker'
+    : (tabOverride ?? (userRole === 'recruiter' ? 'recruiter' : 'seeker'));
 
   // ✅ Tab change এ role check
   const handleTabChange = (tab) => {
@@ -40,7 +41,7 @@ export default function PricingDetailsPage() {
       toast.error('Seeker plans are not available for Recruiters.');
       return;
     }
-    setActiveTab(tab);
+    setTabOverride(tab);
   };
 
   // ✅ Checkout এ role check
