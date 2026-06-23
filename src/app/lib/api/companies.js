@@ -8,6 +8,12 @@ export const getBrowseCompanies = async () => {
   return res;
 }
 
+//get single company
+export const getCompanyById = async (id) => {
+  const res = await serverFetch(`/api/companies/${id}`);
+  return res;
+};
+
 
 export const getCompanyByRecruiterId = async (recruiterId) => {
   return await serverFetch(`/api/companies/recruiter/${recruiterId}`);

@@ -5,6 +5,7 @@ import { getBrowseCompanies } from '../lib/api/companies';
 const BrowseCompanies = async () => {
   const result = await getBrowseCompanies();
   const companies = result?.data || [];
+  console.log('inside companies' , companies)
 
   return (
     <section className='mx-auto min-h-screen max-w-7xl px-4 py-8 md:px-6 lg:px-8'>

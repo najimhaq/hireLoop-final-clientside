@@ -1,5 +1,5 @@
 // app/jobs/[id]/apply/page.jsx
-import AccessDenied from '@/app/components/dashComponents/AccessDenied';
+import AccessDenied from '@/app/components/dashComponents/components/AccessDenied';
 import JobNotFound from '@/app/components/reusable/JobNotFound';
 import { getCompanyJobById } from '@/app/lib/api/getCompanyJobs';
 import { getUserSession } from '@/app/lib/core/session';
@@ -7,9 +7,9 @@ import { redirect } from 'next/navigation';
 import JobApply from './JobApply';
 import { getApplicationsByApplicant } from '@/app/lib/actions/applications';
 import Link from 'next/link';
-import { ApplicationStatusCard } from '@/app/components/dashComponents/ApplicationStatusCard';
-import { AlreadyAppliedPage } from '@/app/components/dashComponents/AlreadyAppliedPage';
-import { UpgradeRequiredPlan } from '@/app/components/dashComponents/UpgradeRequiredPlan';
+import { ApplicationStatusCard } from '@/app/components/dashComponents/components/ApplicationStatusCard';
+import { AlreadyAppliedPage } from '@/app/components/dashComponents/components/AlreadyAppliedPage';
+import { UpgradeRequiredPlan } from '@/app/components/dashComponents/components/UpgradeRequiredPlan';
 
 const ApplyJob = async ({ params }) => {
   const { id } = await params;

@@ -3,7 +3,6 @@
 import { useSession } from '../../lib/auth-client';
 import { RiseLoader } from 'react-spinners';
 import Link from 'next/link';
-import { FiLock } from 'react-icons/fi';
 import UnauthorizedPage from '@/app/unauthorized/page';
 
 export default function RecruiterDashboard() {

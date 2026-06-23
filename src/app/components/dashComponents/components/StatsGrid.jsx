@@ -1,6 +1,6 @@
 'use client';
 
-import { DashboardStats } from "./DashboardStats";
+import { DashboardStats } from "./components/DashboardStats";
 
 
 

@@ -1,10 +1,13 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useSession, signOut } from '../../lib/auth-client';
+
 import { useState } from 'react';
 import { RiseLoader } from 'react-spinners';
 import SidebarContent from './SidebarContent';
+import { useMounted } from '@/app/hooks/useMounted';
+import { signOut, useSession } from '@/app/lib/auth-client';
+
 
 const seekerLinks = [
   { href: '/dashboard/seeker', label: 'Overview', icon: '🏠' },
@@ -31,6 +34,7 @@ const recruiterLinks = [
 const adminLinks = [
   { href: '/dashboard/admin', label: 'Overview', icon: '⚙️' },
   { href: '/dashboard/admin/users', label: 'Users', icon: '👤' },
+  { href: '/dashboard/admin/companies', label: 'Companies', icon: '🏢' },
   { href: '/dashboard/admin/jobs', label: 'Jobs', icon: '💼' },
   { href: '/dashboard/admin/applications', label: 'Applications', icon: '📋' },
   { href: '/dashboard/admin/settings', label: 'Settings', icon: '🛠️' },
@@ -59,6 +63,11 @@ export default function DashboardSidebar() {
   const role = user?.role || 'seeker';
   const links = linksByRole[role] || seekerLinks;
   const accent = accentByRole[role] || accentByRole.seeker;
+
+  const mounted = useMounted()
+  if(!mounted){
+    return null
+  }
 
   if (isPending) {
     return (

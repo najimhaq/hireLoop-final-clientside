@@ -2,7 +2,8 @@
 'use client';
 
 import { Toaster } from 'react-hot-toast';
-import DashboardSidebar from '../components/dashComponents/DashboardSidebar';
+import DashboardSidebar from '../components/dashComponents/components/DashboardSidebar';
+
 
 
 

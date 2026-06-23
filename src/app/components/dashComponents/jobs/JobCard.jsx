@@ -28,17 +28,17 @@ const formatSalary = (amount) => {
 };
 
 export default function JobCard({ job }) {
-  // console.log('Jobcard page:', job)
+  console.log('Jobcard page:', job)
   if (!job || typeof job !== 'object') return null;
 
-  const companyName = safeText(job.companyName, 'Confidential');
+  const companyName = safeText(job?.companyId?.companyName, 'Confidential');
   const jobTitle = safeText(job.jobTitle, 'Untitled role');
   const location = safeText(job.location);
   const jobType = safeText(job.jobType);
   const requirements = safeText(job.requirements);
   const benefits = safeText(job.benefits);
   const responsibilities = safeText(job.responsibilities);
-  const logo = safeText(job.companyLogo);
+  const logo = safeText(job?.companyId?.logo);
   const jobId = safeId(job._id);
 
   const minSalary = formatSalary(job.minSalary);
