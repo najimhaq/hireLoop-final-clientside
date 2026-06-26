@@ -1,11 +1,11 @@
 //lib/actions/createCompanies.js
-import { serverFetch, serverMutation } from "../core/server";
+import { serverFetch, serverMutation } from '../core/server';
 
 export const createCompany = async (newCompanyData) => {
   return await serverMutation({
     path: '/api/companies',
     method: 'POST',
-    payload: newCompanyData
+    payload: newCompanyData,
   });
 };
 

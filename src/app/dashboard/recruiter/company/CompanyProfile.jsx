@@ -2,7 +2,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { createCompany } from '@/app/lib/actions/createCompanies';
 import {
   Form,
   Fieldset,
@@ -27,7 +26,6 @@ import {
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 
-// Layout Shared Style Constants matching your design image
 const textInputClass =
   'w-full bg-zinc-900/50 border border-zinc-800 text-white rounded-lg px-3 py-2.5 outline-none placeholder:text-zinc-600 focus:border-zinc-700 transition';
 const selectBoxClass = 'w-full flex flex-col gap-1';
@@ -40,22 +38,29 @@ const listItemClasses =
 const textAreaClass =
   'w-full bg-zinc-900/50 border border-zinc-800 text-white rounded-lg p-3 outline-none placeholder:text-zinc-600 focus:border-zinc-700 transition resize-none';
 
-export default function CompanyProfile({ recruiter, recruiterCompany }) {
-  // 1. Core State
+// ✅ status helper — component এর বাইরে রাখো
+const getStatusStyles = (status) => {
+  switch (status) {
+    case 'approved':
+      return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+    case 'rejected':
+      return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+    default:
+      return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+  }
+};
+
+export default function CompanyProfile({ recruiterId, recruiterCompany }) {
   const [company, setCompany] = useState(recruiterCompany);
   const [isEditing, setIsEditing] = useState(false);
   const [errors, setErrors] = useState({});
-
-  // Auxiliary Upload States
   const [logoUrl, setLogoUrl] = useState('');
   const [isUploading, setIsUploading] = useState(false);
 
-  // 2. Client side Imgbb Upload Handler
   const handleLogoUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Simple Validation
     if (file.size > 5 * 1024 * 1024) {
       setErrors((prev) => ({ ...prev, logo: 'File size exceeds 5MB limit' }));
       return;
@@ -66,14 +71,10 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
     formData.append('image', file);
 
     try {
-      // Replace with your real IMGBB API key environmental variable injection
       const IMGBB_API_KEY = process.env.NEXT_PUBLIC_IMAGE_UPLOAD_API_URL;
       const response = await fetch(
         `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`,
-        {
-          method: 'POST',
-          body: formData,
-        }
+        { method: 'POST', body: formData }
       );
       const data = await response.json();
 
@@ -83,7 +84,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
       } else {
         setErrors((prev) => ({ ...prev, logo: 'Upload failed. Try again.' }));
       }
-    } catch (err) {
+    } catch {
       setErrors((prev) => ({
         ...prev,
         logo: 'Network error during logo upload',
@@ -93,17 +94,15 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
     }
   };
 
-  // 3. Submit Profile Form Data
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (isUploading) {
-      toast.danger('Please wait until logo upload finishes');
+      toast.error('Please wait until logo upload finishes');
       return;
     }
 
     const formData = new FormData(e.currentTarget);
-
     const companyName = formData.get('companyName')?.toString().trim();
     const website = formData.get('website')?.toString().trim();
     const industry = formData.get('industry')?.toString().trim();
@@ -130,28 +129,37 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
       employeeCount: employeeCount || '1-10 employees',
       description,
       logo: logoUrl || company?.logo || null,
-      recruiterId: recruiter?._id || recruiter?.id || null,
+      status: 'pending',
+      recruiterId: recruiterId || null,
     };
-    // console.log('recruiter =>', recruiter);
-    // console.log(
-    //   'recruiterId sending =>',
-    //   recruiter?._id || recruiter?.id || null
-    // );
+
+    console.log('Final payload:', JSON.stringify(payload));
+    console.log('payload recruiterId:', payload.recruiterId);
+
+
     try {
-      const response = await createCompany(payload);
-      setCompany(response?.data || payload);
+      const res = await fetch('http://localhost:8000/api/companies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || 'Failed');
+
+      setCompany(data?.data || payload);
       setErrors({});
       setIsEditing(false);
       toast.success('Company profile created successfully');
     } catch (error) {
       console.error('Create company failed:', error);
-      toast.danger(error.message || 'Failed to create company');
+      toast.error(error.message || 'Failed to create company');
     }
   };
 
-  // 4. State Toggle helper triggers
   const startRegistration = () => {
-    // Hydrate blank template layout states
     setLogoUrl('');
     setIsEditing(true);
   };
@@ -161,7 +169,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
     setIsEditing(true);
   };
 
-  // --- SUB-VIEW 1: Empty Profile view state ---
+  // --- SUB-VIEW 1: Empty ---
   if (!company?._id && !isEditing) {
     return (
       <div className='max-w-2xl mx-auto my-12 bg-zinc-950 border border-zinc-900 rounded-xl p-8 text-center space-y-6'>
@@ -187,29 +195,18 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
     );
   }
 
-  // --- SUB-VIEW 2: Render Presentation Dashboard view mode ---
+  // --- SUB-VIEW 2: View Mode ---
   if (company && !isEditing) {
-    const getStatusStyles = (status) => {
-      switch (status) {
-        case 'Approved':
-          return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-        case 'Rejected':
-          return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
-        default:
-          return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
-      }
-    };
-
     return (
       <div className='max-w-4xl mx-auto my-8 bg-zinc-950 border border-zinc-900 rounded-xl p-8 space-y-8'>
-        {/* Header Action Grid area */}
+        {/* Header */}
         <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-zinc-900 pb-6'>
-          <div className='flex items-center gap-4'>
+          <div className='flex flex-wrap items-center gap-4'>
             {company.logo ? (
               <Image
                 src={company.logo}
                 alt={company.companyName}
-                className='w-16 h-16 rounded-xl object-contain bg-zinc-900 p-2 border border-zinc-800 logo'
+                className='w-16 h-16 rounded-xl object-contain bg-zinc-900 p-2 border border-zinc-800'
                 width={64}
                 height={64}
                 priority
@@ -220,19 +217,30 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
               </div>
             )}
 
-            <h1 className='text-2xl font-bold text-white'>
-              {company.companyName}
-            </h1>
-
-            <a
-              href={company.website}
-              target='_blank'
-              rel='noreferrer'
-              className='text-sm text-zinc-400 hover:underline flex items-center gap-1 mt-1'
-            >
-              <Globe size={14} className='text-zinc-500' /> {company.website}
-            </a>
+            <div className='flex flex-col gap-1'>
+              <div className='flex items-center gap-3'>
+                <h1 className='text-2xl font-bold text-white'>
+                  {company.companyName}
+                </h1>
+                {/* ✅ Status Badge */}
+                <span
+                  className={`text-xs font-semibold px-3 py-1 rounded-full border capitalize ${getStatusStyles(company.status)}`}
+                >
+                  {company.status || 'pending'}
+                </span>
+              </div>
+              <a
+                href={company.website}
+                target='_blank'
+                rel='noreferrer'
+                className='text-sm text-zinc-400 hover:underline flex items-center gap-1'
+              >
+                <Globe size={14} className='text-zinc-500' />
+                {company.website}
+              </a>
+            </div>
           </div>
+
           <Button
             onPress={startEditing}
             variant='bordered'
@@ -242,7 +250,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
           </Button>
         </div>
 
-        {/* Profile Meta Metrics Grid Section */}
+        {/* Meta Grid */}
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
           <div className='bg-zinc-900/30 border border-zinc-900 p-4 rounded-lg'>
             <span className='text-xs text-zinc-500 uppercase font-semibold block'>
@@ -270,7 +278,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
           </div>
         </div>
 
-        {/* Description Box View Section */}
+        {/* Description */}
         {company.description && (
           <div className='space-y-2'>
             <h3 className='text-sm font-semibold text-zinc-400 uppercase tracking-wider'>
@@ -285,7 +293,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
     );
   }
 
-  // --- SUB-VIEW 3: Form Editing & Registration View Structure ---
+  // --- SUB-VIEW 3: Form ---
   return (
     <div className='max-w-3xl mx-auto my-8 bg-zinc-950 p-8 border border-zinc-900 rounded-xl'>
       <Form
@@ -301,7 +309,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
               : 'Configure Workspace Platform'}
           </legend>
 
-          {/* ROW 1: Company Name + Industry */}
+          {/* ROW 1 */}
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
             <TextField
               name='companyName'
@@ -323,7 +331,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
             <Select
               className={selectBoxClass}
               name='industry'
-              defaultSelectedKeys={[company?.industry || 'technology']}
+              defaultSelectedKeys={[company?.industry || 'Technology']}
             >
               <Label className='text-zinc-400 font-medium text-sm mb-1 block'>
                 Industry / Category
@@ -336,47 +344,28 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
               </Select.Trigger>
               <Select.Popover className={popoverClasses}>
                 <ListBox className='outline-none'>
-                  <ListBox.Item
-                    id='Technology'
-                    className={listItemClasses}
-                    textValue='Technology'
-                  >
-                    Technology
-                  </ListBox.Item>
-                  <ListBox.Item
-                    id='Design'
-                    className={listItemClasses}
-                    textValue='Design'
-                  >
-                    Design
-                  </ListBox.Item>
-                  <ListBox.Item
-                    id='Marketing'
-                    className={listItemClasses}
-                    textValue='Marketing'
-                  >
-                    Marketing
-                  </ListBox.Item>
-                  <ListBox.Item
-                    id='Finance'
-                    className={listItemClasses}
-                    textValue='Finance'
-                  >
-                    Finance
-                  </ListBox.Item>
-                  <ListBox.Item
-                    id='Other'
-                    className={listItemClasses}
-                    textValue='Other'
-                  >
-                    Other
-                  </ListBox.Item>
+                  {[
+                    'Technology',
+                    'Design',
+                    'Marketing',
+                    'Finance',
+                    'Other',
+                  ].map((item) => (
+                    <ListBox.Item
+                      key={item}
+                      id={item}
+                      className={listItemClasses}
+                      textValue={item}
+                    >
+                      {item}
+                    </ListBox.Item>
+                  ))}
                 </ListBox>
               </Select.Popover>
             </Select>
           </div>
 
-          {/* ROW 2: Website URL + Location */}
+          {/* ROW 2 */}
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
             <TextField
               name='website'
@@ -430,12 +419,12 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
             </TextField>
           </div>
 
-          {/* ROW 3: Employee Count + Custom File Logo Upload Block */}
+          {/* ROW 3 */}
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6 items-start'>
             <Select
               className={selectBoxClass}
               name='employeeCount'
-              defaultSelectedKeys={[company?.employeeCount || '1-10']}
+              defaultSelectedKeys={[company?.employeeCount || '1-10 employees']}
             >
               <Label className='text-zinc-400 font-medium text-sm mb-1 block'>
                 Employee Count Range
@@ -448,37 +437,26 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
               </Select.Trigger>
               <Select.Popover className={popoverClasses}>
                 <ListBox className='outline-none'>
-                  <ListBox.Item
-                    id='1-10 employees'
-                    className={listItemClasses}
-                    textValue='1-10 employees'
-                  ></ListBox.Item>
-                  <ListBox.Item
-                    id='11-50 employees'
-                    className={listItemClasses}
-                    textValue='11-50 employees'
-                  >
-                    11-50 employees
-                  </ListBox.Item>
-                  <ListBox.Item
-                    id='51-200 employees'
-                    className={listItemClasses}
-                    textValue='51-200 employees'
-                  >
-                    51-200 employees
-                  </ListBox.Item>
-                  <ListBox.Item
-                    id='201+ employees'
-                    className={listItemClasses}
-                    textValue='201+ employees'
-                  >
-                    201+ employees
-                  </ListBox.Item>
+                  {[
+                    '1-10 employees',
+                    '11-50 employees',
+                    '51-200 employees',
+                    '201+ employees',
+                  ].map((item) => (
+                    <ListBox.Item
+                      key={item}
+                      id={item}
+                      className={listItemClasses}
+                      textValue={item}
+                    >
+                      {item}
+                    </ListBox.Item>
+                  ))}
                 </ListBox>
               </Select.Popover>
             </Select>
 
-            {/* Custom Styled Upload Block matching attachment blueprint exactly */}
+            {/* Logo Upload */}
             <div className='flex flex-col gap-1 w-full'>
               <span className='text-zinc-400 font-medium text-sm'>
                 Company Logo
@@ -495,7 +473,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                     <Image
                       src={logoUrl}
                       alt='Logo Preview'
-                      className='w-full h-full object-cover logo'
+                      className='w-full h-full object-cover'
                       width={64}
                       height={64}
                     />
@@ -514,7 +492,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                     PNG, JPG up to 5MB
                   </span>
                   {errors.logo && (
-                    <span className='text-xs text-danger mt-1'>
+                    <span className='text-xs text-red-400 mt-1'>
                       {errors.logo}
                     </span>
                   )}
@@ -523,7 +501,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
             </div>
           </div>
 
-          {/* ROW 4: Full-Width TextArea Brief Description */}
+          {/* ROW 4 */}
           <TextField
             name='description'
             defaultValue={company?.description || ''}
@@ -540,7 +518,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
           </TextField>
         </Fieldset>
 
-        {/* Form Navigation Action Area controls */}
+        {/* Actions */}
         <div className='flex justify-end gap-3 pt-5 border-t border-zinc-900 w-full'>
           {company && (
             <Button

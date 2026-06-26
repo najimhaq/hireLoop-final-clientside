@@ -1,19 +1,20 @@
 import React from 'react';
 import CompanyProfile from './CompanyProfile';
-
 import { getUserSession } from '@/app/lib/core/session';
 import { getCompanyByRecruiterId } from '@/app/lib/api/companies';
 
-
 const CompanyPage = async () => {
-  let user = null;
+  let recruiterId = null;
   let company = null;
 
   try {
-    user = await getUserSession();
+    const user = await getUserSession();
+    // console.log('recruiterId:', user?.id); // ← confirm করো
 
-    if (user?.id) {
-      const result = await getCompanyByRecruiterId(user.id);
+    recruiterId = user?.id || null;
+
+    if (recruiterId) {
+      const result = await getCompanyByRecruiterId(recruiterId);
       company = result?.data || null;
     }
   } catch (error) {
@@ -22,7 +23,7 @@ const CompanyPage = async () => {
 
   return (
     <div>
-      <CompanyProfile recruiter={user} recruiterCompany={company} />
+      <CompanyProfile recruiterId={recruiterId} recruiterCompany={company} />
     </div>
   );
 };

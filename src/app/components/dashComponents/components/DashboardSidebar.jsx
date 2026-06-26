@@ -25,7 +25,7 @@ const recruiterLinks = [
   { href: '/dashboard/recruiter/applicants', label: 'Applicants', icon: '👥' },
   { href: '/dashboard/recruiter/transactions', label: 'Transactions', icon: '💸' },
   {
-    href: '/dashboard/recruiter/profile',
+    href: '/dashboard/recruiter/company',
     label: 'Company Profile',
     icon: '🏢',
   },

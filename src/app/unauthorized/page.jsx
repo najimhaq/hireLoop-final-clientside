@@ -1,23 +1,40 @@
-// src/app/unauthorized/page.jsx  (অথবা যেকোনো জায়গায়)
 'use client';
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import { FiLock, FiArrowLeft, FiHome } from 'react-icons/fi';
+import { useSession } from '../lib/auth-client';
+
+
+const roleRedirect = {
+  seeker: '/dashboard/seeker',
+  recruiter: '/dashboard/recruiter',
+  admin: '/dashboard/admin',
+};
 
 export default function UnauthorizedPage() {
+  const { data: session } = useSession();
+  const user = session?.user;
+
+  // ✅ Sign in থাকলে dashboard link, না থাকলে signin link
+  const primaryHref = user
+    ? roleRedirect[user.role] || '/dashboard'
+    : '/signin';
+
+  const primaryLabel = user ? 'Go to My Dashboard' : 'Sign In';
+
   return (
-    <div className='relative min-h-screen overflow-hidden bg-gradient-to-br from-black via-gray-950 to-black flex items-center justify-center px-4'>
+    <div className='relative min-h-screen overflow-hidden bg-linear-to-br from-black via-gray-950 to-black flex items-center justify-center px-4'>
       {/* Background orbs */}
       <motion.div
         animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
         transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
-        className='absolute -top-1/3 -left-1/4 w-[500px] h-[500px] rounded-full bg-violet-600/10 blur-[120px] pointer-events-none'
+        className='absolute -top-1/3 -left-1/4 w-125 h-125 rounded-full bg-violet-600/10 blur-[120px] pointer-events-none'
       />
       <motion.div
         animate={{ scale: [1, 1.15, 1], rotate: [0, -90, 0] }}
         transition={{ duration: 14, repeat: Infinity, ease: 'linear' }}
-        className='absolute -bottom-1/3 -right-1/4 w-[500px] h-[500px] rounded-full bg-fuchsia-600/10 blur-[120px] pointer-events-none'
+        className='absolute -bottom-1/3 -right-1/4 w-125 h-125 rounded-full bg-fuchsia-600/10 blur-[120px] pointer-events-none'
       />
 
       {/* Card */}
@@ -28,8 +45,7 @@ export default function UnauthorizedPage() {
         className='relative z-10 w-full max-w-md'
       >
         <div className='overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl text-center'>
-          {/* Top gradient bar */}
-          <div className='h-1 w-full bg-gradient-to-r from-red-500 via-rose-500 to-red-500' />
+          <div className='h-1 w-full bg-linear-to-r from-red-500 via-rose-500 to-red-500' />
 
           <div className='px-8 py-10 sm:px-10'>
             {/* Lock icon */}
@@ -44,13 +60,12 @@ export default function UnauthorizedPage() {
               }}
               className='mx-auto mb-6 w-20 h-20 relative flex items-center justify-center'
             >
-              {/* Pulse ring */}
               <motion.div
                 animate={{ scale: [1, 1.6], opacity: [0.5, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
                 className='absolute inset-0 rounded-full bg-red-500/30'
               />
-              <div className='w-20 h-20 rounded-full bg-gradient-to-br from-red-500/20 to-rose-500/20 border border-red-500/30 flex items-center justify-center'>
+              <div className='w-20 h-20 rounded-full bg-linear-to-br from-red-500/20 to-rose-500/20 border border-red-500/30 flex items-center justify-center'>
                 <FiLock className='w-8 h-8 text-red-400' strokeWidth={2} />
               </div>
             </motion.div>
@@ -74,13 +89,14 @@ export default function UnauthorizedPage() {
               <h1 className='text-2xl font-bold text-white mb-3'>
                 Access Denied
               </h1>
+              {/* ✅ Message ও dynamic */}
               <p className='text-sm text-gray-400 leading-relaxed max-w-xs mx-auto'>
-                You don&apos;t have permission to view this page. Please log in
-                with the correct account or contact support.
+                {user
+                  ? `Your account (${user.role}) doesn't have permission to view this page.`
+                  : "You don't have permission to view this page. Please sign in with the correct account."}
               </p>
             </motion.div>
 
-            {/* Divider */}
             <div className='my-8 h-px w-full bg-white/5' />
 
             {/* Buttons */}
@@ -90,14 +106,15 @@ export default function UnauthorizedPage() {
               transition={{ delay: 0.55 }}
               className='flex flex-col gap-3'
             >
-              <Link href='/sign-in'>
+              {/* ✅ Primary button — dynamic */}
+              <Link href={primaryHref}>
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className='flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-shadow cursor-pointer'
+                  className='flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-violet-600 to-fuchsia-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-shadow cursor-pointer'
                 >
                   <FiLock size={15} />
-                  Sign In
+                  {primaryLabel}
                 </motion.div>
               </Link>
 
@@ -122,8 +139,7 @@ export default function UnauthorizedPage() {
             </motion.div>
           </div>
 
-          {/* Bottom note */}
-          <div className='border-t border-white/5 bg-white/[0.02] px-8 py-4'>
+          <div className='border-t border-white/5 bg-white/2 px-8 py-4'>
             <p className='text-xs text-gray-500'>
               Think this is a mistake?{' '}
               <Link
