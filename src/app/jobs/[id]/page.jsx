@@ -1,4 +1,6 @@
+import { getLoggedInRecruiterCompany } from '@/app/lib/api/companies';
 import { getCompanyJobById } from '@/app/lib/api/getCompanyJobs';
+import Image from 'next/image';
 import Link from 'next/link';
 import {
   FiMapPin,
@@ -22,14 +24,12 @@ const splitTextToList = (value) => {
 
 const formatSalary = (minSalary, maxSalary, currency = 'USD') => {
   if (!minSalary && !maxSalary) return 'Salary not specified';
-
   const format = (amount) =>
     new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency,
       maximumFractionDigits: 0,
     }).format(amount);
-
   if (minSalary && maxSalary)
     return `${format(minSalary)} - ${format(maxSalary)}`;
   if (minSalary) return `From ${format(minSalary)}`;
@@ -41,7 +41,6 @@ const formatDate = (value) => {
   const raw = value?.$date || value;
   const date = new Date(raw);
   if (Number.isNaN(date.getTime())) return 'Not available';
-
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
@@ -54,6 +53,8 @@ const JobDetailsPage = async ({ params }) => {
   const result = await getCompanyJobById(id);
   const job = result?.data ?? null;
 
+  const companyData = await getLoggedInRecruiterCompany();
+  // console.log('JobDetailsPage job', job);
   if (!job) {
     return (
       <section className='min-h-screen bg-black px-4 pb-8 pt-3 text-white md:px-6 lg:px-8'>
@@ -68,6 +69,12 @@ const JobDetailsPage = async ({ params }) => {
     );
   }
 
+  // ✅ company info populate থেকে নেওয়া
+  const company = job?.companyId;
+  const companyName = companyData?.data?.companyName || 'Company not specified';
+  const companyLogo = companyData?.data?.logo || null;
+  const companyLocation = companyData?.data?.location || null;
+
   const responsibilities = splitTextToList(job?.responsibilities);
   const requirements = splitTextToList(job?.requirements);
   const benefits = splitTextToList(job?.benefits);
@@ -81,18 +88,34 @@ const JobDetailsPage = async ({ params }) => {
       <div className='mx-auto max-w-7xl'>
         <div className='grid gap-8 lg:grid-cols-[1.7fr_0.9fr]'>
           <div className='space-y-6'>
+            {/* ── Hero Card ── */}
             <div className='rounded-[32px] border border-white/10 bg-zinc-950/80 p-6 shadow-[0_10px_40px_rgba(0,0,0,0.22)] backdrop-blur-xl md:p-8'>
               <div className='mb-6'>
-                <div>
-                  <p className='mb-2 text-sm font-medium uppercase tracking-[0.18em] text-zinc-500'>
-                    Job opening
-                  </p>
-                  <h1 className='text-3xl font-semibold tracking-tight bg-linear-to-r from-violet-400 via-pink-400 to-fuchsia-600 bg-clip-text text-transparent md:text-4xl'>
-                    {job?.jobTitle || 'Untitled role'}
-                  </h1>
-                  <p className='mt-3 text-base text-zinc-400'>
-                    {job?.companyName || 'Company not specified'}
-                  </p>
+                <p className='mb-2 text-sm font-medium uppercase tracking-[0.18em] text-zinc-500'>
+                  Job opening
+                </p>
+                <h1 className='text-3xl font-semibold tracking-tight bg-linear-to-r from-violet-400 via-pink-400 to-fuchsia-600 bg-clip-text text-transparent md:text-4xl'>
+                  {job?.jobTitle || 'Untitled role'}
+                </h1>
+
+                {/* ✅ Company info */}
+                <div className='mt-3 flex items-center gap-2.5'>
+                  {companyLogo && (
+                    <Image
+                      src={companyLogo}
+                      alt={companyName}
+                      width={28}
+                      height={28}
+                      className='w-7 h-7 rounded-lg object-contain bg-white/5 border border-white/10 p-0.5'
+                    />
+                  )}
+                  <p className='text-base text-zinc-400'>{companyName}</p>
+                  {companyLocation && (
+                    <>
+                      <span className='text-zinc-700'>·</span>
+                      <p className='text-sm text-zinc-500'>{companyLocation}</p>
+                    </>
+                  )}
                 </div>
 
                 <div className='mt-5 flex flex-wrap items-center gap-3'>
@@ -100,13 +123,17 @@ const JobDetailsPage = async ({ params }) => {
                     <FiBookmark className='h-4 w-4' />
                     Save
                   </button>
-                  <Link href={`/jobs/${id}/apply`} className='inline-flex h-11 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-black transition hover:bg-zinc-200'>
+                  <Link
+                    href={`/jobs/${id}/apply`}
+                    className='inline-flex h-11 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-black transition hover:bg-zinc-200'
+                  >
                     Apply this job
                     <FiArrowUpRight className='h-4 w-4' />
                   </Link>
                 </div>
               </div>
 
+              {/* Info Cards */}
               <div className='grid gap-3 sm:grid-cols-2 xl:grid-cols-4'>
                 <div className='rounded-2xl border border-white/8 bg-white/5 p-4'>
                   <div className='mb-2 flex items-center gap-2 text-zinc-500'>
@@ -116,7 +143,9 @@ const JobDetailsPage = async ({ params }) => {
                     </span>
                   </div>
                   <p className='text-sm font-medium text-zinc-200'>
-                    {job?.location || 'Not specified'}
+                    {job?.isRemote
+                      ? '🌍 Remote'
+                      : job?.location || 'Not specified'}
                   </p>
                 </div>
 
@@ -156,6 +185,7 @@ const JobDetailsPage = async ({ params }) => {
               </div>
             </div>
 
+            {/* ── About Role ── */}
             <div className='rounded-[32px] border border-white/10 bg-zinc-950/80 p-6 md:p-8'>
               <h2 className='text-2xl font-semibold tracking-tight text-white'>
                 About this role
@@ -165,6 +195,7 @@ const JobDetailsPage = async ({ params }) => {
               </p>
             </div>
 
+            {/* ── Responsibilities ── */}
             <div className='rounded-[32px] border border-white/10 bg-zinc-950/80 p-6 md:p-8'>
               <h2 className='text-2xl font-semibold tracking-tight text-white'>
                 Responsibilities
@@ -173,7 +204,7 @@ const JobDetailsPage = async ({ params }) => {
                 {responsibilities.length > 0 ? (
                   responsibilities.map((item, index) => (
                     <li
-                      key={`${item}-${index}`}
+                      key={`resp-${index}`}
                       className='flex gap-3 text-sm leading-7 text-zinc-400 md:text-base'
                     >
                       <FiCheckCircle className='mt-1 h-5 w-5 shrink-0 text-emerald-400' />
@@ -188,6 +219,7 @@ const JobDetailsPage = async ({ params }) => {
               </ul>
             </div>
 
+            {/* ── Requirements ── */}
             <div className='rounded-[32px] border border-white/10 bg-zinc-950/80 p-6 md:p-8'>
               <h2 className='text-2xl font-semibold tracking-tight text-white'>
                 Requirements
@@ -196,7 +228,7 @@ const JobDetailsPage = async ({ params }) => {
                 {requirements.length > 0 ? (
                   requirements.map((item, index) => (
                     <li
-                      key={`${item}-${index}`}
+                      key={`req-${index}`}
                       className='flex gap-3 text-sm leading-7 text-zinc-400 md:text-base'
                     >
                       <FiCheckCircle className='mt-1 h-5 w-5 shrink-0 text-cyan-400' />
@@ -212,12 +244,21 @@ const JobDetailsPage = async ({ params }) => {
             </div>
           </div>
 
+          {/* ── Sidebar ── */}
           <aside className='space-y-6'>
+            {/* Quick Overview */}
             <div className='rounded-[32px] border border-white/10 bg-zinc-950/80 p-6'>
               <h3 className='text-lg font-semibold text-white'>
                 Quick overview
               </h3>
               <div className='mt-5 space-y-4'>
+                <div className='flex items-center justify-between border-b border-white/8 pb-3'>
+                  <span className='text-sm text-zinc-500'>Company</span>
+                  {/* ✅ Fix */}
+                  <span className='text-sm font-medium text-zinc-200'>
+                    {companyName}
+                  </span>
+                </div>
                 <div className='flex items-center justify-between border-b border-white/8 pb-3'>
                   <span className='text-sm text-zinc-500'>Experience</span>
                   <span className='text-sm font-medium capitalize text-zinc-200'>
@@ -251,6 +292,7 @@ const JobDetailsPage = async ({ params }) => {
               </div>
             </div>
 
+            {/* Benefits */}
             <div className='rounded-[32px] border border-white/10 bg-zinc-950/80 p-6'>
               <h3 className='text-lg font-semibold text-white'>
                 Benefits & perks
@@ -259,7 +301,7 @@ const JobDetailsPage = async ({ params }) => {
                 {benefits.length > 0 ? (
                   benefits.map((perk, index) => (
                     <li
-                      key={`${perk}-${index}`}
+                      key={`perk-${index}`}
                       className='rounded-2xl border border-white/8 bg-white/5 px-4 py-3 text-sm text-zinc-300'
                     >
                       {perk}
@@ -273,6 +315,7 @@ const JobDetailsPage = async ({ params }) => {
               </ul>
             </div>
 
+            {/* Role Snapshot */}
             <div className='rounded-[32px] border border-white/10 bg-zinc-950/80 p-6'>
               <h3 className='text-lg font-semibold text-white'>
                 Role snapshot

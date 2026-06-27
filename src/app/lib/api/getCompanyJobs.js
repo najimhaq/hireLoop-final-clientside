@@ -3,18 +3,15 @@ import { serverFetch } from '../core/server';
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
-export const getCompanyJobs = async (companyId, status = 'active') => {
+export const getCompanyJobs = async (companyId, status = null) => {
   try {
-    const response = await fetch(
-      `${baseUrl}/api/jobs?companyId=${companyId}&status=${status}`,
-      {
-        cache: 'no-store',
-      }
-    );
+    const url = status
+      ? `${baseUrl}/api/jobs?companyId=${companyId}&status=${status}`
+      : `${baseUrl}/api/jobs?companyId=${companyId}`; // status filter ছাড়া
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch company jobs');
-    }
+    const response = await fetch(url, { cache: 'no-store' });
+
+    if (!response.ok) throw new Error('Failed to fetch company jobs');
 
     const result = await response.json();
     return Array.isArray(result?.data) ? result.data : [];

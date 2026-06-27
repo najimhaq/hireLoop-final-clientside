@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { apiPatchForApproval } from '@/app/lib/api/apiUtils';
 
 export default function CompanyStatusActions({ companyId, currentStatus }) {
   const [status, setStatus] = useState(currentStatus);
@@ -12,38 +13,22 @@ export default function CompanyStatusActions({ companyId, currentStatus }) {
 
   const handleAction = async (newStatus) => {
     setLoading(newStatus);
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/companies/${companyId}/status`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ status: newStatus }),
-        }
-      );
 
-      // ✅ JSON parse করার আগে content-type চেক করুন
-      const contentType = res.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error(
-          `Server returned HTML instead of JSON. Status: ${res.status}`
-        );
-      }
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Request failed');
-
+    const { data, error } = await apiPatchForApproval(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/companies/${companyId}/status`,
+      { status: newStatus }
+    );
+    if (error) {
+      toast.error(error);
+    } else {
       setStatus(newStatus);
       toast.success(
         newStatus === 'approved' ? 'Company approved ✓' : 'Company rejected'
       );
       router.refresh();
-    } catch (err) {
-      toast.error(err.message || 'Something went wrong');
-    } finally {
-      setLoading(null);
     }
+
+    setLoading(null);
   };
 
   if (status === 'approved') {

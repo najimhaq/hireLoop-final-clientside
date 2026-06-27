@@ -4,6 +4,7 @@ import { getBrowseCompanyJobs } from '../lib/api/getCompanyJobs';
 export default async function BrowseJobs() {
   // Fetched server-side on the initial request
   const jobs = await getBrowseCompanyJobs();
+  // console.log('BrowseJobs', jobs);
 
   return (
     <div className='w-full min-h-screen bg-zinc-950 p-6 md:p-12 text-white'>

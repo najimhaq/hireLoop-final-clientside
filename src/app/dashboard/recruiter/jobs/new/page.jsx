@@ -3,10 +3,10 @@ import PostJobForm from './PostJobForm';
 
 const PostJobPage = async () => {
   const company = await getLoggedInRecruiterCompany();
-  // console.log('inCOmpany', company);
+  console.log('inCOmpany', company);
   return (
     <div>
-      {company && company.status === 'approved' ? (
+      {company && company?.data?.status === 'approved' ? (
         <PostJobForm company={company} />
       ) : (
         <div className='flex min-h-[60vh] items-center justify-center px-4'>
