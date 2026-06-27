@@ -153,8 +153,12 @@ function CompanyCard({ company }) {
       </div>
 
       {/* Description */}
-      <p className='text-xs text-zinc-500 leading-relaxed max-w-xs hidden lg:block line-clamp-2'>
+      {/* <p className='text-xs text-zinc-500 leading-relaxed max-w-xs hidden lg:block line-clamp-2'>
         {company.description}
+      </p> */}
+      {/* Company Job Count */}
+      <p className='text-xs text-zinc-600 shrink-0 hidden md:block'>
+        Total Jobs - {company.jobCount}
       </p>
 
       {/* Date */}
