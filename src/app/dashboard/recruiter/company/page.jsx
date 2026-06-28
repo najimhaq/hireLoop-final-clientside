@@ -1,6 +1,6 @@
 import React from 'react';
 import CompanyProfile from './CompanyProfile';
-import { getUserSession } from '@/app/lib/core/session';
+import { getUser} from '@/app/lib/core/session';
 import { getCompanyByRecruiterId } from '@/app/lib/api/companies';
 
 const CompanyPage = async () => {
@@ -8,7 +8,7 @@ const CompanyPage = async () => {
   let company = null;
 
   try {
-    const user = await getUserSession();
+    const user = await getUser();
     // console.log('recruiterId:', user?.id); // ← confirm করো
 
     recruiterId = user?.id || null;

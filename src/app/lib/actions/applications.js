@@ -13,7 +13,10 @@ export const getApplicationByApplicationId = async (applicationId) => {
 };
 
 export const getApplicationsByApplicant = async (userId) => {
-  // console.log('Fetching URL:', `/api/applications/applicant/${userId}`);
+  if (!userId || userId === 'undefined') {
+    console.warn('Invalid applicantId:', userId);
+    return [];
+  }
 
   const result = await serverFetch(`/api/applications/applicant/${userId}`);
   return result?.data ?? [];

@@ -1,4 +1,4 @@
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 // console.log('Fetching URL:', baseUrl);
 
 if (!baseUrl) {
@@ -7,6 +7,10 @@ if (!baseUrl) {
 
 //for getting data - GET
 export const serverFetch = async (path, options = {}) => {
+  if (!path || path.includes('/undefined')) {
+    throw new Error(`Invalid request path: ${path}`);
+  }
+
   let res;
 
   try {

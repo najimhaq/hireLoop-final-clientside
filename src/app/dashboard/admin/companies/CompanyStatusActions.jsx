@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-import { apiPatchForApproval } from '@/app/lib/api/apiUtils';
+import { apiPatch } from '@/app/lib/core/apiUtils';
+
 
 export default function CompanyStatusActions({ companyId, currentStatus }) {
   const [status, setStatus] = useState(currentStatus);
@@ -12,7 +13,7 @@ export default function CompanyStatusActions({ companyId, currentStatus }) {
 
   const handleAction = async (newStatus) => {
     setLoading(newStatus);
-    const { data, error } = await apiPatchForApproval(
+    const { data, error } = await apiPatch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/companies/${companyId}/status`,
       { status: newStatus }
     );

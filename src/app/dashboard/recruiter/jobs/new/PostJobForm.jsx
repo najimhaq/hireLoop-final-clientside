@@ -44,7 +44,7 @@ const experienceLevels = [
 ];
 
 export default function PostJobForm({ company }) {
-  console.log('Get Company Id : ', company.data);
+  // console.log('Get Company Id : ', company.data);
   const router = useRouter();
 
   const [currentStep, setCurrentStep] = useState(1);

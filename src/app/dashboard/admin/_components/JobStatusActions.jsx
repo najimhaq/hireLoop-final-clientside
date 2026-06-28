@@ -6,8 +6,9 @@ import { useRouter } from 'next/navigation';
 import { FiEye, FiCheck, FiX } from 'react-icons/fi';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { apiPatchForApproval } from '@/app/lib/api/apiUtils';
+
 import DeleteJobButton from '@/app/jobs/[id]/delete/DeleteJobButton';
+import { apiPatch } from '@/app/lib/core/apiUtils';
 
 export default function JobStatusActions({ job }) {
   const router = useRouter();
@@ -17,7 +18,7 @@ export default function JobStatusActions({ job }) {
   const handleStatusChange = async (newStatus) => {
     setLoading(newStatus);
 
-    const { data, error } = await apiPatchForApproval(
+    const { data, error } = await apiPatch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/jobs/${job._id}/status`,
       { status: newStatus }
     );

@@ -26,7 +26,7 @@ export default function JobListingContainer({ initialJobs }) {
       : Array.isArray(initialJobs)
         ? initialJobs
         : [];
-console.log('inside JobListingContainer', jobs);
+// console.log('inside JobListingContainer', jobs);
     const query = normalizeSearch(searchQuery);
 
     return jobs.filter((job) => {

@@ -1,5 +1,6 @@
 import { serverFetch } from "../core/server";
 import { getUserSession } from "../core/session";
+import { getUser } from '../core/session';
 
 
 //sob company dekhar jonno
@@ -19,7 +20,8 @@ export const getCompanyByRecruiterId = async (recruiterId) => {
   return await serverFetch(`/api/companies/recruiter/${recruiterId}`);
 };
 
+
 export const getLoggedInRecruiterCompany = async (id) => {
-  const user = await getUserSession();
+  const user = await getUser();
   return await getCompanyByRecruiterId(user?.id);
 };

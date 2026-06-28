@@ -4,7 +4,7 @@
 import Link from 'next/link';
 
 export default function SeekerDashboard({ user, applications }) {
-  console.log('SeekerDashboard', applications);
+  // console.log('SeekerDashboard', applications);
   const statCards = [
     {
       label: 'Applications Sent',

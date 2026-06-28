@@ -133,8 +133,8 @@ export default function CompanyProfile({ recruiterId, recruiterCompany }) {
       recruiterId: recruiterId || null,
     };
 
-    console.log('Final payload:', JSON.stringify(payload));
-    console.log('payload recruiterId:', payload.recruiterId);
+    // console.log('Final payload:', JSON.stringify(payload));
+    // console.log('payload recruiterId:', payload.recruiterId);
 
 
     try {

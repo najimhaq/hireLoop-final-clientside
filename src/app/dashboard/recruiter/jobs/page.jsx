@@ -1,4 +1,5 @@
 // src/app/dashboard/recruiter/jobs/page.jsx
+
 import React from 'react';
 import {
   FiEye,
@@ -14,6 +15,8 @@ import { getLoggedInRecruiterCompany } from '@/app/lib/api/companies';
 import Link from 'next/link';
 import { getCompanyJobs } from '@/app/lib/api/getCompanyJobs';
 import DeleteJobButton from '@/app/jobs/[id]/delete/DeleteJobButton';
+
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,9 +56,14 @@ const formatSalary = (min, max, currency = 'USD') => {
   return '—';
 };
 
+
 const RecruiterJobs = async () => {
   const company = await getLoggedInRecruiterCompany();
   const jobs = (await getCompanyJobs(company?.data?._id)) || [];
+
+  // console.log('company:', company);
+  // console.log('companyId:', company?.data?._id);
+
 
   const activeCount = jobs.filter(
     (j) => j.status?.toLowerCase() === 'active'

@@ -11,7 +11,7 @@ const normalize = (value) => {
 };
 
 export default function BrowseCompaniesClient({ companies = [] }) {
-    console.log('companies', companies)
+    // console.log('companies', companies)
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIndustry, setSelectedIndustry] = useState('all');
   const [selectedLocation, setSelectedLocation] = useState('all');

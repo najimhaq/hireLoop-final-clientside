@@ -1,11 +1,13 @@
 // app/dashboard/seeker/page.jsx — Server Component
-import { getUserSession } from '@/app/lib/core/session';
+
 import { getApplicationsByApplicant } from '@/app/lib/actions/applications';
 import { redirect } from 'next/navigation';
 import SeekerDashboard from './SeekerDashboard';
+import { getUser } from '@/app/lib/core/session';
 
 export default async function SeekerDashboardPage() {
-  const user = await getUserSession();
+  const user = await getUser();
+  console.log('in Seeker Main Page', user)
 
   if (!user) redirect('/signin');
   if (user.role !== 'seeker') redirect('/unauthorized');

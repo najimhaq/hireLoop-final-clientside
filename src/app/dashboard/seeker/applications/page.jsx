@@ -1,11 +1,12 @@
 // app/dashboard/seeker/applications/page.jsx — Server Component
 import { getApplicationsByApplicant } from '@/app/lib/api/getApplicationsByApplicant';
-import { getUserSession } from '@/app/lib/core/session';
+
 import { redirect } from 'next/navigation';
 import ApplicationsTable from './ApplicationsTable';
+import { getUser } from '@/app/lib/core/session';
 
 const SeekerApplications = async () => {
-  const user = await getUserSession();
+  const user = await getUser();
   if (!user) redirect('/signin');
 
   const seekerApplications = await getApplicationsByApplicant(user.id);

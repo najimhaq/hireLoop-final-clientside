@@ -28,7 +28,7 @@ const formatSalary = (amount) => {
 };
 
 export default function JobCard({ job }) {
-  console.log('Jobcard page:', job)
+  // console.log('Jobcard page:', job)
   if (!job || typeof job !== 'object') return null;
 
   const companyName = safeText(job?.companyId?.companyName, 'Confidential');

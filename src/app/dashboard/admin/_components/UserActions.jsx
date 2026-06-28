@@ -1,13 +1,11 @@
-// src/app/dashboard/admin/users/_components/UserActions.jsx
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { apiDelete, apiPatchForApproval } from '@/app/lib/api/apiUtils';
+import { apiPatch } from '@/app/lib/core/apiUtils';
 
 
-// ✅ Component এর বাইরে define করুন
 const ActionBtn = ({ onClick, disabled, color, children }) => (
   <button
     onClick={onClick}
@@ -23,12 +21,11 @@ export default function UserActions({ user }) {
   const [loading, setLoading] = useState(null);
 
   const status = user.status?.toLowerCase();
-  const role = user.role?.toLowerCase();
   const base = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const handleStatusChange = async (newStatus) => {
     setLoading(newStatus);
-    const { error } = await apiPatchForApproval(`${base}/api/users/${user._id}/status`, {
+    const { error } = await apiPatch(`${base}/api/users/${user._id}/status`, {
       status: newStatus,
     });
     if (error) toast.error(error);
@@ -68,9 +65,6 @@ export default function UserActions({ user }) {
 
   return (
     <div className='flex items-center justify-end gap-1.5'>
-
-
-      {/* Status toggle */}
       {status === 'suspended' ? (
         <ActionBtn
           onClick={() => handleStatusChange('active')}
@@ -89,7 +83,6 @@ export default function UserActions({ user }) {
         </ActionBtn>
       )}
 
-      {/* Delete */}
       {status === 'suspended' && (
         <ActionBtn
           onClick={handleDelete}
