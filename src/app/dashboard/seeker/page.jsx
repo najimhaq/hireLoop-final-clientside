@@ -7,7 +7,7 @@ import { getUser } from '@/app/lib/core/session';
 
 export default async function SeekerDashboardPage() {
   const user = await getUser();
-  console.log('in Seeker Main Page', user)
+  // console.log('in Seeker Main Page', user)
 
   if (!user) redirect('/signin');
   if (user.role !== 'seeker') redirect('/unauthorized');

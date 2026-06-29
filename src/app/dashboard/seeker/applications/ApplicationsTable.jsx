@@ -120,14 +120,23 @@ export default function ApplicationsTable({ applications }) {
                 {/* Company */}
                 {/* <p className='text-sm text-slate-300 truncate'>{company}</p> */}
                 {/* Company Logo */}
-                <Image
-                  src={logo}
-                  alt={company}
-                  width={62}
-                  height={62}
-                  className='h-8 w-8 shrink-0 rounded-full object-cover'
-                />
-
+                {/* Company */}
+                <div className='flex items-center gap-2 min-w-0'>
+                  {logo ? (
+                    <Image
+                      src={logo}
+                      alt={company}
+                      width={32}
+                      height={32}
+                      className='h-8 w-8 shrink-0 rounded-full object-cover'
+                    />
+                  ) : (
+                    <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-slate-400'>
+                      {company?.charAt(0)?.toUpperCase() || '?'}
+                    </div>
+                  )}
+                  <p className='truncate text-sm text-slate-300'>{company}</p>
+                </div>
 
                 {/* Applied */}
                 <p className='text-sm text-slate-400'>{appliedAt}</p>

@@ -1,3 +1,7 @@
+import { headers } from "next/headers";
+import { auth } from "../auth";
+
+// src/app/lib/core/server.js
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 // console.log('Fetching URL:', baseUrl);
 
@@ -6,10 +10,21 @@ if (!baseUrl) {
 }
 
 //for getting data - GET
+
+const getJwt = async () => {
+  const res = await auth.api.getSession({
+    headers: await headers(),
+    asResponse: true,
+  });
+  return res.headers.get('set-auth-jwt') || null;
+};
+
 export const serverFetch = async (path, options = {}) => {
   if (!path || path.includes('/undefined')) {
     throw new Error(`Invalid request path: ${path}`);
   }
+
+  const token = await getJwt();
 
   let res;
 
@@ -17,9 +32,14 @@ export const serverFetch = async (path, options = {}) => {
     res = await fetch(`${baseUrl}${path}`, {
       ...options,
       cache: 'no-store',
-      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options.headers || {}),
+      },
     });
-  } catch {
+  } catch (err) {
+    console.error('Fetch error:', err.cause || err.message);
     throw new Error(`Failed to connect to API: ${baseUrl}${path}`);
   }
 

@@ -8,6 +8,13 @@ export const submitApplication = async (applicationData) => {
   });
 };
 
+export const getAllJobApplications = async ({ page = 1, limit = 50 } = {}) => {
+  const params = new URLSearchParams();
+  params.set('page', String(page));
+  params.set('limit', String(limit));
+
+  return await serverFetch(`/api/applications?${params.toString()}`);
+};
 export const getApplicationByApplicationId = async (applicationId) => {
   return await serverFetch(`/api/applications/${applicationId}`);
 };

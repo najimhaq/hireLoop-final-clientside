@@ -28,7 +28,7 @@ export const getCompanyJobById = async (jobId) => {
   });
 }
 export const getBrowseCompanyJobs = async (companyId) => {
-  return serverFetch(`/api/jobs`);
+  return serverFetch(`/api/jobs?status=active&limit=100`);
 };
 
 //return serverFetch(`/api/jobs?companyId=${companyId}&status=active`);
